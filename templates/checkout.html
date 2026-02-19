@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mx-auto px-6 py-20 max-w-4xl">
+    <h1 class="font-serif text-4xl mb-12">Finalize Your Order</h1>
+
+    <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-16">
+        {% csrf_token %}
+        
+        <div class="space-y-6">
+            <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400">Shipping Information</h3>
+            <input type="text" name="full_name" placeholder="FULL NAME" required class="w-full border-b border-gray-200 py-3 focus:outline-none focus:border-[#FB7185] transition-colors">
+            <input type="text" name="phone_number" placeholder="WHATSAPP NUMBER" required class="w-full border-b border-gray-200 py-3 focus:outline-none focus:border-[#FB7185] transition-colors">
+            <textarea name="address" placeholder="COMPLETE SHIPPING ADDRESS" required class="w-full border-b border-gray-200 py-3 focus:outline-none focus:border-[#FB7185] transition-colors h-32"></textarea>
+        </div>
+
+        <div class="bg-gray-50 p-8 rounded-sm space-y-8">
+            <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400">Payment Method</h3>
+            
+            <div class="space-y-4">
+                <label class="flex items-center space-x-3 cursor-pointer">
+                    <input type="radio" name="payment_method" value="QR" checked class="accent-[#FB7185]" onclick="document.getElementById('qr-section').style.display='block'">
+                    <span class="text-sm uppercase tracking-widest font-medium">Scan QR & Upload</span>
+                </label>
+                <label class="flex items-center space-x-3 cursor-pointer">
+                    <input type="radio" name="payment_method" value="COD" class="accent-[#FB7185]" onclick="document.getElementById('qr-section').style.display='none'">
+                    <span class="text-sm uppercase tracking-widest font-medium">Cash on Delivery</span>
+                </label>
+            </div>
+
+            <div id="qr-section" class="space-y-6">
+                <div class="bg-white p-4 border border-gray-200 text-center">
+                    <img src="/static/images/payment_qr.jpeg" alt="Payment QR" class="mx-auto w-48 h-48 object-contain mb-4">
+                    <p class="text-[10px] text-gray-400 uppercase tracking-widest">Scan to pay ₹{{ cart.get_total_price }}</p>
+                </div>
+                <div>
+                    <label class="block text-[9px] uppercase tracking-widest text-gray-400 mb-2">Upload Payment Proof (Screenshot)</label>
+                    <input type="file" name="payment_screenshot" class="text-[10px] file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-gray-200 file:uppercase">
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-black text-white py-4 uppercase text-[10px] font-bold tracking-[0.2em] hover:bg-[#FB7185] transition-all">
+                Place Order — ₹{{ cart.get_total_price }}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

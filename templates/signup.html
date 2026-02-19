@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-[70vh] flex items-center justify-center bg-white py-20 px-4">
+    <div class="w-full max-w-md">
+        
+        <div class="text-center mb-10">
+            <span class="text-[#FB7185] font-bold tracking-[0.3em] uppercase text-[10px] mb-4 block">Join Us</span>
+            <h1 class="font-serif text-4xl md:text-5xl text-black mb-2">Create Account</h1>
+            <p class="text-gray-400 text-xs tracking-widest uppercase">Begin your journey with Happy Heavens</p>
+        </div>
+
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="space-y-4">
+                {% for field in form %}
+                    <div>
+                        {{ field }}
+                        {% if field.errors %}
+                            <p class="text-red-500 text-[10px] uppercase tracking-widest mt-1">{{ field.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="w-full bg-black text-white uppercase text-xs font-bold tracking-[0.2em] py-4 hover:bg-[#FB7185] transition-all duration-300 shadow-lg">
+                Register
+            </button>
+            
+            <div class="text-center mt-8 text-[10px] uppercase tracking-widest">
+                <span class="text-gray-400">Already a member?</span>
+                <a href="{% url 'login' %}" class="ml-2 text-black border-b border-black hover:text-[#FB7185] hover:border-[#FB7185] transition-all">
+                    Login Here
+                </a>
+            </div>
+        </form>
+
+    </div>
+</div>
+{% endblock %}

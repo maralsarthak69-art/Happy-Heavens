@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mx-auto px-6 py-24 max-w-5xl">
+    <div class="mb-16 border-b border-gray-100 pb-10">
+        <h1 class="font-serif text-6xl md:text-8xl tracking-tighter lowercase">my <br> creations</h1>
+        <p class="text-[10px] text-gray-400 uppercase tracking-[0.3em] font-bold mt-4">Order History & Status Tracking</p>
+    </div>
+
+    {% if orders %}
+        <div class="space-y-12">
+            {% for order in orders %}
+            <div class="group border border-gray-100 p-8 hover:border-[#FB7185]/30 transition-all duration-500 bg-white">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                    <div>
+                        <span class="text-[9px] text-gray-400 uppercase tracking-widest block mb-1">Order Ref.</span>
+                        <h2 class="font-serif text-2xl">#{{ order.id }} — {{ order.created_at|date:"M d, Y" }}</h2>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <span class="text-[10px] uppercase tracking-widest font-bold px-4 py-2 rounded-full 
+                            {% if order.status == 'Pending' %} bg-orange-50 text-orange-600
+                            {% elif order.status == 'Approved' %} bg-blue-50 text-blue-600
+                            {% elif order.status == 'Shipped' %} bg-purple-50 text-purple-600
+                            {% elif order.status == 'Delivered' %} bg-green-50 text-green-600
+                            {% else %} bg-gray-50 text-gray-500 {% endif %}">
+                            {{ order.get_status_display }}
+                        </span>
+                        <span class="text-sm font-medium tracking-tight">₹{{ order.total_amount }}</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-gray-50 pt-8">
+                    <div>
+                        <h3 class="text-[9px] uppercase tracking-[0.3em] text-gray-400 mb-4">Items Included</h3>
+                        <ul class="space-y-2">
+                            {% for item in order.items.all %}
+                            <li class="text-xs flex justify-between">
+                                <span class="text-gray-600">{{ item.product.name }} <span class="text-gray-300 ml-2">x{{ item.quantity }}</span></span>
+                                <span class="font-medium">₹{{ item.price }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="flex justify-between md:justify-end gap-12 text-right">
+                        <div>
+                            <h3 class="text-[9px] uppercase tracking-[0.3em] text-gray-400 mb-4">Method</h3>
+                            <p class="text-[10px] font-bold uppercase tracking-widest">{{ order.get_payment_method_display }}</p>
+                        </div>
+                        <div>
+                            <h3 class="text-[9px] uppercase tracking-[0.3em] text-gray-400 mb-4">Verification</h3>
+                            {% if order.payment_screenshot %}
+                                <span class="text-[10px] text-green-500 font-bold uppercase tracking-widest">Screenshot Uploaded</span>
+                            {% else %}
+                                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">COD Registered</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="h-[40vh] flex flex-col items-center justify-center text-center">
+            <p class="text-gray-400 uppercase text-[10px] tracking-[0.4em] mb-8">You haven't commissioned any items yet.</p>
+            <a href="{% url 'home' %}" class="border-b border-black pb-1 uppercase text-[10px] font-bold tracking-widest hover:text-[#FB7185] hover:border-[#FB7185] transition-colors">Start Your Collection</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="h-[70vh] flex flex-col items-center justify-center text-center px-6">
+    <div class="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mb-8 animate-pulse">
+        <svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 13l4 4L19 7"></path>
+        </svg>
+    </div>
+
+    {% if order.payment_method == 'COD' %}
+        <h1 class="font-serif text-5xl mb-6">Order Confirmed</h1>
+        <p class="text-gray-400 text-[10px] uppercase tracking-[0.3em] max-w-sm mb-12 leading-loose">
+            Your request for Cash on Delivery has been received. Please keep ₹{{ order.total_amount }} ready at the time of delivery.
+        </p>
+    {% else %}
+        <h1 class="font-serif text-5xl mb-6">Proof Received</h1>
+        <p class="text-gray-400 text-[10px] uppercase tracking-[0.3em] max-w-sm mb-12 leading-loose">
+            Your payment screenshot for Order #{{ order.id }} is under review. Sarthak will verify it shortly.
+        </p>
+    {% endif %}
+
+    <a href="{% url 'home' %}" class="bg-black text-white px-12 py-4 rounded-full uppercase text-[10px] font-bold tracking-[0.2em] hover:bg-[#FB7185] transition-all">
+        Continue Shopping
+    </a>
+</div>
+{% endblock %}

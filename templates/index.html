@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="relative h-[90vh] w-full bg-white overflow-hidden border-b border-gray-100">
+    <div id="hero-slider" class="relative h-full w-full">
+        {% for product in new_arrivals %}
+        <div class="hero-slide absolute inset-0 opacity-0 transition-all duration-1000 ease-in-out flex flex-col md:flex-row {% if forloop.first %}opacity-100 z-10{% endif %}">
+            
+            <div class="w-full md:w-3/5 h-1/2 md:h-full relative overflow-hidden bg-[#FDFDFD]">
+                {% if product.stock < 5 and product.stock > 0 %}
+                    <span class="absolute top-8 left-8 bg-black text-white text-[9px] font-bold px-4 py-2 uppercase tracking-[0.3em] z-30 shadow-2xl">
+                        Limited Edition — Only {{ product.stock }} Left
+                    </span>
+                {% endif %}
+
+                {% with image=product.images.first %}
+                    {% if image %}
+                        <img src="{{ image.image.url }}" class="w-full h-full object-cover transform scale-100 hover:scale-105 transition-transform duration-[5000ms] ease-out" alt="{{ product.name }}">
+                    {% else %}
+                        <div class="w-full h-full flex items-center justify-center text-gray-200 uppercase tracking-[0.5em] text-xs">Happy Heavens Studio</div>
+                    {% endif %}
+                {% endwith %}
+                <div class="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-black/5 to-transparent hidden md:block"></div>
+            </div>
+
+            <div class="w-full md:w-2/5 h-1/2 md:h-full flex flex-col justify-center px-8 md:px-16 lg:px-24 bg-white">
+                <div class="max-w-md">
+                    <span class="inline-block text-[#FB7185] font-bold tracking-[0.4em] uppercase text-[9px] mb-6">
+                        Latest Creation
+                    </span>
+                    
+                    <h1 class="font-serif text-4xl md:text-6xl lg:text-7xl text-black leading-[1.05] tracking-tighter mb-8">
+                        {{ product.name }}
+                    </h1>
+                    
+                    <p class="text-gray-500 text-sm font-light leading-relaxed mb-10 border-l-2 border-gray-100 pl-6 italic">
+                        {{ product.description|truncatewords:25 }}
+                    </p>
+
+                    <div class="flex items-center space-x-8">
+                        <a href="{% url 'product_detail' product.id %}" class="bg-black text-white px-10 py-4 rounded-full uppercase text-[10px] font-bold tracking-[0.2em] hover:bg-[#FB7185] transition-all duration-500 shadow-xl">
+                            Explore — ₹{{ product.price }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <a href="#shop" class="absolute bottom-10 right-10 z-30 text-black flex flex-col items-center group/scroll hidden md:flex">
+        <span class="text-[8px] uppercase tracking-[0.3em] mb-2 opacity-0 group-hover/scroll:opacity-100 transition-opacity duration-500">The Archive</span>
+        <div class="animate-bounce p-2 border border-black/10 rounded-full">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+        </div>
+    </a>
+
+    <div class="absolute bottom-0 left-0 w-full h-1 bg-gray-50 z-30">
+        <div id="progress-bar" class="h-full bg-[#FB7185] w-0 transition-none"></div>
+    </div>
+</section>
+
+<div id="shop" class="container mx-auto px-8 mt-24">
+    <div class="flex flex-col md:flex-row justify-between items-end mb-20 border-b border-gray-100 pb-10">
+        <div>
+            <h3 class="font-serif text-6xl md:text-9xl text-black mb-6 lowercase tracking-tighter leading-[0.85]">
+                the <br> archive
+            </h3>
+            <p class="text-[10px] text-gray-400 uppercase tracking-[0.3em] font-bold">Pune, India &bull; Handcrafted Essentials</p>
+        </div>
+        <span class="text-[10px] text-gray-500 tracking-[0.2em] uppercase font-medium mb-2">{{ products.count }} Items in Stock</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-24 mb-32">
+        {% for product in products %}
+            <div class="group cursor-pointer">
+                <a href="{% url 'product_detail' product.id %}">
+                    <div class="relative bg-white aspect-[3/4] mb-8 overflow-hidden border border-gray-100 group-hover:border-gray-300 transition-all duration-500">
+                        {% if product.stock < 5 and product.stock > 0 %}
+                            <span class="absolute top-4 left-4 bg-[#FB7185] text-white text-[8px] font-bold px-3 py-1 uppercase tracking-widest z-30">
+                                Low Stock
+                            </span>
+                        {% endif %}
+
+                        {% with gallery=product.images.all|slice:":2" %}
+                            {% if gallery %}
+                                <img src="{{ gallery.0.image.url }}" alt="{{ product.name }}" class="absolute inset-0 w-full h-full object-cover transition duration-1000 ease-out group-hover:scale-105">
+                                {% if gallery|length > 1 %}
+                                    <img src="{{ gallery.1.image.url }}" alt="{{ product.name }}" class="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-1000 ease-in-out z-10">
+                                {% endif %}
+                            {% endif %}
+                        {% endwith %}
+                        
+                        <button class="absolute bottom-0 left-0 w-full bg-white text-black uppercase text-[9px] font-bold tracking-[0.3em] py-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500 z-20 border-t border-gray-100 hover:bg-black hover:text-white">
+                            View Details
+                        </button>
+                    </div>
+                </a>
+                <div class="text-center space-y-2">
+                    <a href="{% url 'category_detail' product.category.slug %}" class="text-[8px] text-[#FB7185] uppercase tracking-[0.4em] font-bold hover:underline">
+                        {{ product.category.name }}
+                    </a>
+                    <a href="{% url 'product_detail' product.id %}">
+                        <h2 class="font-serif text-2xl text-black leading-tight">{{ product.name }}</h2>
+                    </a>
+                    <p class="text-[11px] text-gray-400 font-medium tracking-widest">₹{{ product.price }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<section class="relative w-full py-24 bg-[#FAFAFA] overflow-hidden my-20 border-t border-gray-100">
+    <div class="container mx-auto px-8 flex flex-col md:flex-row items-center">
+        <div class="w-full md:w-1/2 z-10 mb-16 md:mb-0 md:pr-12">
+            <span class="text-[#FB7185] font-bold tracking-[0.3em] uppercase text-[10px] mb-6 block">Our Ethos</span>
+            <h2 class="font-serif text-5xl md:text-7xl text-black leading-none mb-8 tracking-tighter">
+                Crafted <br> <span class="italic text-gray-400 font-light">With Intention</span>
+            </h2>
+            <p class="text-gray-500 max-w-sm mb-10 font-light leading-relaxed text-sm">
+                Each creation is an arrangement that speaks the language of care, designed for the moments that deserve to be remembered forever.
+            </p>
+            <a href="{% url 'customize' %}" class="inline-block border-b border-black pb-1 uppercase text-[10px] font-bold tracking-[0.2em] hover:text-[#FB7185] hover:border-[#FB7185] transition-colors">
+                Personalize Your Vision
+            </a>
+        </div>
+
+        <div class="w-full md:w-1/2 relative h-[500px] md:h-[600px]">
+            <div class="absolute top-0 right-0 w-11/12 h-full bg-gray-200 overflow-hidden rounded-sm shadow-xl group">
+                <img src="{% static 'images/story_main.jpg' %}" 
+                    class="w-full h-full object-cover group-hover:scale-105 transition duration-[2000ms]" alt="Studio Workspace">
+            </div>
+            <div class="absolute bottom-10 -left-4 w-2/5 aspect-[3/4] bg-white p-2 shadow-2xl rotate-3 hover:rotate-0 transition duration-500">
+                <img src="{% static 'images/story_small.jpg' %}" 
+                class="w-full h-full object-cover" alt="Detail Close-up">
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    const slides = document.querySelectorAll('.hero-slide');
+    const progressBar = document.getElementById('progress-bar');
+    let currentIndex = 0;
+    const intervalTime = 7000; 
+
+    function resetProgressBar() {
+        progressBar.style.transition = 'none';
+        progressBar.style.width = '0%';
+        setTimeout(() => {
+            progressBar.style.transition = `width ${intervalTime}ms linear`;
+            progressBar.style.width = '100%';
+        }, 50);
+    }
+
+    function rotateSlides() {
+        if (slides.length <= 1) return;
+        slides[currentIndex].classList.remove('opacity-100', 'z-10');
+        slides[currentIndex].classList.add('opacity-0');
+        currentIndex = (currentIndex + 1) % slides.length;
+        slides[currentIndex].classList.remove('opacity-0');
+        slides[currentIndex].classList.add('opacity-100', 'z-10');
+        resetProgressBar();
+    }
+
+    if (slides.length > 0) {
+        resetProgressBar();
+        if (slides.length > 1) {
+            setInterval(rotateSlides, intervalTime);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+</script>
+{% endblock %}

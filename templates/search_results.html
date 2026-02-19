@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto px-8 py-24">
+    <div class="mb-16 border-b border-gray-100 pb-10">
+        <h1 class="font-serif text-5xl md:text-7xl tracking-tighter lowercase">
+            Search <br> <span class="text-gray-400">Results</span>
+        </h1>
+        <p class="text-[10px] text-gray-400 uppercase tracking-[0.3em] font-bold mt-4">
+            Showing results for: <span class="text-black">"{{ query }}"</span>
+        </p>
+    </div>
+
+    {% if results %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-24 mb-32">
+            {% for product in results %}
+                <div class="group cursor-pointer">
+                    <a href="{% url 'product_detail' product.id %}">
+                        <div class="relative bg-white aspect-[3/4] mb-8 overflow-hidden border border-gray-100 group-hover:border-gray-300 transition-all duration-500">
+                            {% if product.stock < 5 and product.stock > 0 %}
+                                <span class="absolute top-4 left-4 bg-[#FB7185] text-white text-[8px] font-bold px-3 py-1 uppercase tracking-widest z-30">
+                                    Low Stock
+                                </span>
+                            {% endif %}
+
+                            {% with gallery=product.images.all|slice:":1" %}
+                                {% if gallery %}
+                                    <img src="{{ gallery.0.image.url }}" alt="{{ product.name }}" class="absolute inset-0 w-full h-full object-cover transition duration-1000 ease-out group-hover:scale-105">
+                                {% else %}
+                                    <div class="w-full h-full flex items-center justify-center bg-gray-50 text-[9px] text-gray-300 uppercase tracking-widest">No Image</div>
+                                {% endif %}
+                            {% endwith %}
+                            
+                            <button class="absolute bottom-0 left-0 w-full bg-white text-black uppercase text-[9px] font-bold tracking-[0.3em] py-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500 z-20 border-t border-gray-100 hover:bg-black hover:text-white">
+                                View Details
+                            </button>
+                        </div>
+                    </a>
+                    <div class="text-center space-y-2">
+                        <div class="text-[8px] text-[#FB7185] uppercase tracking-[0.4em] font-bold">{{ product.category.name }}</div>
+                        <a href="{% url 'product_detail' product.id %}">
+                            <h2 class="font-serif text-2xl text-black leading-tight">{{ product.name }}</h2>
+                        </a>
+                        <p class="text-[11px] text-gray-400 font-medium tracking-widest">₹{{ product.price }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="h-[40vh] flex flex-col items-center justify-center text-center">
+            <p class="text-gray-400 uppercase text-[10px] tracking-[0.4em] mb-8">
+                We couldn't find any creations matching your search.
+            </p>
+            <a href="{% url 'home' %}" class="border-b border-black pb-1 uppercase text-[10px] font-bold tracking-widest hover:text-[#FB7185] hover:border-[#FB7185] transition-colors">
+                Explore the Archive
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
