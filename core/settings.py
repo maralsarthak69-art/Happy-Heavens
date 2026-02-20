@@ -43,8 +43,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # WhiteNoise is active only on Render for production static files
-    *(['whitenoise.middleware.WhiteNoiseMiddleware'] if IS_HEROKU else []),
+    'whitenoise.middleware.WhiteNoiseMiddleware',       
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
