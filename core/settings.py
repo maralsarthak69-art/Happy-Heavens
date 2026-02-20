@@ -116,10 +116,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # Production Storage settings
+# Production Storage settings
 if IS_HEROKU:
-    # UPDATED: Switched from CompressedManifestStaticFilesStorage to CompressedStaticFilesStorage
-    # This ignores missing GIS/Admin icons that were causing the build to fail
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+    # We are switching to the standard StaticFilesStorage.
+    # This disables the auto-compression that is causing the build to crash.
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
     
     # Use Cloudinary for Media files (images) only in production/Render
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
