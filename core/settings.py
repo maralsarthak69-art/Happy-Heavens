@@ -116,7 +116,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # Production Storage settings
-# Production Storage settings
 if IS_HEROKU:
     # We are switching to the standard StaticFilesStorage.
     # This disables the auto-compression that is causing the build to crash.
