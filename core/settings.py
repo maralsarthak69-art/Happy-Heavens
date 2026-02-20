@@ -11,7 +11,7 @@ env = environ.Env(
     DEBUG=(bool, False)
 )
 
-# Robust pathing: Points exactly to the .env file in your root directory
+# Robust pathing to .env file
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # SECURITY: Pull these directly from your .env file
@@ -35,15 +35,15 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'cloudinary_storage',  # Cloudinary storage must come before staticfiles
+    'cloudinary_storage',  # Must come before staticfiles for Cloudinary
     'django.contrib.staticfiles',
-    'cloudinary',          # Cloudinary integration
-    'store',               # Your main app
+    'cloudinary',
+    'store',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',       
+    'whitenoise.middleware.WhiteNoiseMiddleware', # REQUIRED for serving CSS on Render
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -75,7 +75,6 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 # 2. Database Configuration
 if not IS_HEROKU:
-    # LOCAL: Connects to your pgAdmin 'happy_heavens_db'
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -116,21 +115,20 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # Production Storage settings
 if IS_HEROKU:
-    # We are switching to the standard StaticFilesStorage.
-    # This disables the auto-compression that is causing the build to crash.
+    # Standard storage avoids build crashes while WhiteNoise serves files
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
     
-    # Use Cloudinary for Media files (images) only in production/Render
+    # Use Cloudinary for Media files (images) only in production
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-# Cloudinary Credentials (Optional: can also use CLOUDINARY_URL in .env)
+# Cloudinary Credentials
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': env('CLOUD_NAME', default=''),
     'API_KEY': env('API_KEY', default=''),
     'API_SECRET': env('API_SECRET', default=''),
 }
 
-# Local Media (Used locally unless you want to test Cloudinary on your laptop)
+# Local Media (Used locally)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
