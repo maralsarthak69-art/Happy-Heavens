@@ -116,7 +116,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 # Production Storage settings
 if IS_HEROKU:
     # Standard storage avoids build crashes while WhiteNoise serves files
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
     
     # Use Cloudinary for Media files (images) only in production
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
