@@ -11,16 +11,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ---------------------------------------------------------------------------
 env = environ.Env(DEBUG=(bool, False))
 
-<<<<<<< HEAD
-# Robust pathing to .env file
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-=======
-# Read .env only when the file exists (local dev). On Render the vars are
-# injected directly into os.environ — no .env file is present there.
+# Read .env only when the file exists (local dev).
+# On Render the vars are injected directly into os.environ.
 _env_file = os.path.join(BASE_DIR, '.env')
 if os.path.isfile(_env_file):
     environ.Env.read_env(_env_file)
->>>>>>> 33de52f (production ready: supabase + cloudflare + cloudinary stack)
 
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
@@ -40,7 +35,6 @@ else:
             "ALLOWED_HOST environment variable is required when DEBUG=False."
         )
     ALLOWED_HOSTS = [_allowed_host, f'www.{_allowed_host}']
-    # Covers both your custom domain (via Cloudflare) and the raw Render URL
     _render_host = env('RENDER_EXTERNAL_HOSTNAME', default=None)
     if _render_host:
         ALLOWED_HOSTS.append(_render_host)
@@ -65,11 +59,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-<<<<<<< HEAD
-    'cloudinary_storage',  # Must come before staticfiles for Cloudinary
-=======
     'cloudinary_storage',       # must come before staticfiles
->>>>>>> 33de52f (production ready: supabase + cloudflare + cloudinary stack)
     'django.contrib.staticfiles',
     'cloudinary',
     'store',
@@ -80,11 +70,7 @@ INSTALLED_APPS = [
 # ---------------------------------------------------------------------------
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-<<<<<<< HEAD
-    'whitenoise.middleware.WhiteNoiseMiddleware', # REQUIRED for serving CSS on Render
-=======
     'whitenoise.middleware.WhiteNoiseMiddleware',   # right after SecurityMiddleware
->>>>>>> 33de52f (production ready: supabase + cloudflare + cloudinary stack)
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -117,15 +103,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-<<<<<<< HEAD
-# 2. Database Configuration
-if not IS_HEROKU:
-=======
 # ---------------------------------------------------------------------------
 # 7. Database
 # ---------------------------------------------------------------------------
 if not IS_PRODUCTION:
->>>>>>> 33de52f (production ready: supabase + cloudflare + cloudinary stack)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -148,7 +129,7 @@ else:
     }
 
 # ---------------------------------------------------------------------------
-# 8. Cache — database-backed for free tier, zero extra services needed
+# 8. Cache — database-backed, zero extra services needed
 # ---------------------------------------------------------------------------
 CACHES = {
     'default': {
@@ -173,7 +154,6 @@ if not DEBUG:
     X_FRAME_OPTIONS = 'DENY'
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_BROWSER_XSS_FILTER = True
-    # Trust Cloudflare's forwarded proto header
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # ---------------------------------------------------------------------------
@@ -201,48 +181,27 @@ STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
-<<<<<<< HEAD
-# Production Storage settings
-if IS_HEROKU:
-    # Standard storage avoids build crashes while WhiteNoise serves files
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
-    
-    # Use Cloudinary for Media files (images) only in production
-=======
 if IS_PRODUCTION:
-    # WhiteNoise: compressed + cache-busted fingerprinted filenames
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-    # Cloudinary for all uploaded media
->>>>>>> 33de52f (production ready: supabase + cloudflare + cloudinary stack)
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
-<<<<<<< HEAD
-# Cloudinary Credentials
-=======
->>>>>>> 33de52f (production ready: supabase + cloudflare + cloudinary stack)
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': env('CLOUD_NAME', default=''),
     'API_KEY': env('API_KEY', default=''),
     'API_SECRET': env('API_SECRET', default=''),
 }
 
-<<<<<<< HEAD
-# Local Media (Used locally)
-=======
->>>>>>> 33de52f (production ready: supabase + cloudflare + cloudinary stack)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # ---------------------------------------------------------------------------
-# 13. Sessions — optimised to reduce DB writes
+# 13. Sessions
 # ---------------------------------------------------------------------------
-SESSION_COOKIE_AGE = 604800          # 7 days
-SESSION_SAVE_EVERY_REQUEST = False   # only save when session data actually changes
+SESSION_COOKIE_AGE = 604800
+SESSION_SAVE_EVERY_REQUEST = False
 
-<<<<<<< HEAD
-=======
 # ---------------------------------------------------------------------------
 # 14. Email
 # ---------------------------------------------------------------------------
@@ -263,5 +222,4 @@ STORE_OWNER_EMAIL = env('STORE_OWNER_EMAIL', default=EMAIL_HOST_USER)
 # ---------------------------------------------------------------------------
 # 15. Misc
 # ---------------------------------------------------------------------------
->>>>>>> 33de52f (production ready: supabase + cloudflare + cloudinary stack)
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
