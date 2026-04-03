@@ -59,8 +59,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'cloudinary_storage',       # must come before staticfiles
-    'django.contrib.staticfiles',
+    'django.contrib.staticfiles',  # staticfiles before cloudinary_storage
+    'cloudinary_storage',
     'cloudinary',
     'store',
 ]
@@ -182,17 +182,17 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 if IS_PRODUCTION:
-    # Use default storage for collectstatic compatibility,
-    # WhiteNoise serves and compresses files at runtime instead
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
+# Tell cloudinary_storage to only handle MEDIA, not static files
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': env('CLOUD_NAME', default=''),
     'API_KEY': env('API_KEY', default=''),
     'API_SECRET': env('API_SECRET', default=''),
+    'STATICFILES': False,  # never let cloudinary touch static files
 }
 
 MEDIA_URL = '/media/'
