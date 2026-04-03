@@ -5,7 +5,8 @@ pip install -r requirements.txt
 
 # Clear any stale staticfiles before collecting fresh
 rm -rf staticfiles/
-python manage.py collectstatic --noinput
+# Force default storage during collectstatic to avoid WhiteNoise post-processing errors
+DJANGO_SETTINGS_MODULE=core.settings STATICFILES_STORAGE=django.contrib.staticfiles.storage.StaticFilesStorage python manage.py collectstatic --noinput
 
 # Use DIRECT_URL for migrations if set (bypasses pgBouncer transaction mode limitation)
 # Falls back to DATABASE_URL if DIRECT_URL is not set
