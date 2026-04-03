@@ -15,13 +15,13 @@
                         <span class="text-[9px] text-gray-400 uppercase tracking-widest block mb-1">Order Ref.</span>
                         <h2 class="font-serif text-2xl">#{{ order.id }} — {{ order.created_at|date:"M d, Y" }}</h2>
                     </div>
-                    
+
                     <div class="flex items-center space-x-4">
-                        <span class="text-[10px] uppercase tracking-widest font-bold px-4 py-2 rounded-full 
-                            {% if order.status == 'Pending' %} bg-orange-50 text-orange-600
-                            {% elif order.status == 'Approved' %} bg-blue-50 text-blue-600
-                            {% elif order.status == 'Shipped' %} bg-purple-50 text-purple-600
-                            {% elif order.status == 'Delivered' %} bg-green-50 text-green-600
+                        <span class="text-[10px] uppercase tracking-widest font-bold px-4 py-2 rounded-full
+                            {% if order.status == 'PENDING' %} bg-orange-50 text-orange-600
+                            {% elif order.status == 'CONFIRMED' %} bg-blue-50 text-blue-600
+                            {% elif order.status == 'SHIPPED' %} bg-purple-50 text-purple-600
+                            {% elif order.status == 'DELIVERED' %} bg-green-50 text-green-600
                             {% else %} bg-gray-50 text-gray-500 {% endif %}">
                             {{ order.get_status_display }}
                         </span>
@@ -29,37 +29,59 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-gray-50 pt-8">
-                    <div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-gray-50 pt-8 items-end">
+                    <div class="md:col-span-2">
                         <h3 class="text-[9px] uppercase tracking-[0.3em] text-gray-400 mb-4">Items Included</h3>
                         <ul class="space-y-2">
                             {% for item in order.items.all %}
                             <li class="text-xs flex justify-between">
-                                <span class="text-gray-600">{{ item.product.name }} <span class="text-gray-300 ml-2">x{{ item.quantity }}</span></span>
-                                <span class="font-medium">₹{{ item.price }}</span>
+                                <span class="text-gray-600">
+                                    {% if item.product %}{{ item.product.name }}{% else %}<span class="italic text-gray-400">Product removed</span>{% endif %}
+                                    <span class="text-gray-300 ml-2">x{{ item.quantity }}</span>
+                                </span>
+                                <span class="font-medium">₹{{ item.subtotal }}</span>
                             </li>
                             {% endfor %}
                         </ul>
                     </div>
 
-                    <div class="flex justify-between md:justify-end gap-12 text-right">
-                        <div>
-                            <h3 class="text-[9px] uppercase tracking-[0.3em] text-gray-400 mb-4">Method</h3>
+                    <div class="flex flex-col items-start md:items-end gap-4">
+                        <div class="text-right">
+                            <h3 class="text-[9px] uppercase tracking-[0.3em] text-gray-400 mb-1">Method</h3>
                             <p class="text-[10px] font-bold uppercase tracking-widest">{{ order.get_payment_method_display }}</p>
                         </div>
-                        <div>
-                            <h3 class="text-[9px] uppercase tracking-[0.3em] text-gray-400 mb-4">Verification</h3>
-                            {% if order.payment_screenshot %}
-                                <span class="text-[10px] text-green-500 font-bold uppercase tracking-widest">Screenshot Uploaded</span>
-                            {% else %}
-                                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">COD Registered</span>
-                            {% endif %}
-                        </div>
+                        <a href="{% url 'order_detail' order.pk %}"
+                           class="border-b border-black pb-1 uppercase text-[10px] font-bold tracking-widest hover:text-[#FB7185] hover:border-[#FB7185] transition-colors">
+                            View Details →
+                        </a>
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
+
+        {% if page_obj.has_other_pages %}
+        <div class="flex items-center justify-center space-x-4 mt-16">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}"
+                   class="border-b border-black pb-1 uppercase text-[10px] font-bold tracking-widest hover:text-[#FB7185] hover:border-[#FB7185] transition-colors">
+                    ← Previous
+                </a>
+            {% endif %}
+
+            <span class="text-[10px] uppercase tracking-widest text-gray-400">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}"
+                   class="border-b border-black pb-1 uppercase text-[10px] font-bold tracking-widest hover:text-[#FB7185] hover:border-[#FB7185] transition-colors">
+                    Next →
+                </a>
+            {% endif %}
+        </div>
+        {% endif %}
+
     {% else %}
         <div class="h-[40vh] flex flex-col items-center justify-center text-center">
             <p class="text-gray-400 uppercase text-[10px] tracking-[0.4em] mb-8">You haven't commissioned any items yet.</p>

@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mx-auto px-6 py-24 max-w-3xl">
+
+    <div class="mb-12">
+        <a href="{% url 'my_orders' %}" class="text-[10px] uppercase tracking-widest text-gray-400 hover:text-black transition-colors">
+            ← Back to My Orders
+        </a>
+    </div>
+
+    <div class="mb-12 border-b border-gray-100 pb-10">
+        <span class="text-[9px] text-gray-400 uppercase tracking-widest block mb-2">Order Reference</span>
+        <h1 class="font-serif text-5xl md:text-6xl tracking-tighter">#{{ order.id }}</h1>
+        <p class="text-[10px] text-gray-400 uppercase tracking-[0.3em] font-bold mt-3">
+            Placed on {{ order.created_at|date:"F d, Y" }} at {{ order.created_at|time:"H:i" }}
+        </p>
+    </div>
+
+    <!-- Status & Payment Row -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12 pb-12 border-b border-gray-100">
+        <div>
+            <h3 class="text-[9px] uppercase tracking-[0.3em] text-gray-400 mb-2">Status</h3>
+            <span class="text-[10px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full inline-block
+                {% if order.status == 'PENDING' %} bg-orange-50 text-orange-600
+                {% elif order.status == 'CONFIRMED' %} bg-blue-50 text-blue-600
+                {% elif order.status == 'SHIPPED' %} bg-purple-50 text-purple-600
+                {% elif order.status == 'DELIVERED' %} bg-green-50 text-green-600
+                {% else %} bg-gray-50 text-gray-500 {% endif %}">
+                {{ order.get_status_display }}
+            </span>
+        </div>
+        <div>
+            <h3 class="text-[9px] uppercase tracking-[0.3em] text-gray-400 mb-2">Payment</h3>
+            <p class="text-[10px] font-bold uppercase tracking-widest">{{ order.get_payment_method_display }}</p>
+        </div>
+        <div>
+            <h3 class="text-[9px] uppercase tracking-[0.3em] text-gray-400 mb-2">Total</h3>
+            <p class="text-sm font-bold tracking-tight">₹{{ order.total_amount }}</p>
+        </div>
+        <div>
+            <h3 class="text-[9px] uppercase tracking-[0.3em] text-gray-400 mb-2">Proof</h3>
+            {% if order.payment_screenshot %}
+                <a href="{{ order.payment_screenshot.url }}" target="_blank"
+                   class="text-[10px] text-[#FB7185] font-bold uppercase tracking-widest hover:underline">
+                    View Screenshot
+                </a>
+            {% else %}
+                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">COD</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Delivery Details -->
+    <div class="mb-12 pb-12 border-b border-gray-100">
+        <h2 class="text-[9px] uppercase tracking-[0.3em] text-gray-400 mb-6">Delivery Details</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-700">
+            <div>
+                <span class="text-[9px] uppercase tracking-widest text-gray-400 block mb-1">Name</span>
+                <p class="font-medium">{{ order.full_name }}</p>
+            </div>
+            <div>
+                <span class="text-[9px] uppercase tracking-widest text-gray-400 block mb-1">Phone</span>
+                <p class="font-medium">{{ order.phone_number }}</p>
+            </div>
+            <div class="md:col-span-2">
+                <span class="text-[9px] uppercase tracking-widest text-gray-400 block mb-1">Address</span>
+                <p class="font-medium">{{ order.address }}, {{ order.city }} — {{ order.pincode }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Items -->
+    <div>
+        <h2 class="text-[9px] uppercase tracking-[0.3em] text-gray-400 mb-6">Items in This Order</h2>
+
+        <div class="border border-gray-100 rounded-sm overflow-hidden">
+            <!-- Table header -->
+            <div class="bg-gray-50 px-6 py-3 grid grid-cols-12 gap-4">
+                <span class="col-span-5 text-[9px] uppercase tracking-widest text-gray-400">Product</span>
+                <span class="col-span-2 text-[9px] uppercase tracking-widest text-gray-400 text-center">Qty</span>
+                <span class="col-span-2 text-[9px] uppercase tracking-widest text-gray-400 text-right">Unit Price</span>
+                <span class="col-span-3 text-[9px] uppercase tracking-widest text-gray-400 text-right">Subtotal</span>
+            </div>
+
+            <!-- Items -->
+            <div class="divide-y divide-gray-100">
+                {% for item in items %}
+                <div class="px-6 py-4 grid grid-cols-12 gap-4 items-center">
+                    <div class="col-span-5">
+                        {% if item.product %}
+                            <p class="text-sm font-medium text-gray-800">{{ item.product.name }}</p>
+                        {% else %}
+                            <p class="text-sm italic text-gray-400">Product no longer available</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-span-2 text-center">
+                        <span class="text-sm text-gray-600">{{ item.quantity }}</span>
+                    </div>
+                    <div class="col-span-2 text-right">
+                        <span class="text-sm text-gray-600">₹{{ item.price }}</span>
+                    </div>
+                    <div class="col-span-3 text-right">
+                        <span class="text-sm font-medium text-gray-800">₹{{ item.subtotal }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Total row -->
+            <div class="px-6 py-4 border-t border-gray-200 flex justify-between items-center bg-gray-50">
+                <span class="text-[10px] uppercase tracking-widest font-bold text-gray-700">Order Total</span>
+                <span class="text-base font-bold text-gray-900">₹{{ order.total_amount }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-16 text-center">
+        <a href="{% url 'home' %}" class="bg-black text-white px-12 py-4 rounded-full uppercase text-[10px] font-bold tracking-[0.2em] hover:bg-[#FB7185] transition-all">
+            Continue Shopping
+        </a>
+    </div>
+
+</div>
+{% endblock %}

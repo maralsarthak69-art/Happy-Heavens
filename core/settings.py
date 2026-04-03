@@ -2,48 +2,89 @@ import os
 from pathlib import Path
 import dj_database_url
 import environ
+from django.core.exceptions import ImproperlyConfigured
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# 1. Initialize environment variables
-env = environ.Env(
-    DEBUG=(bool, False)
-)
+# ---------------------------------------------------------------------------
+# 1. Environment
+# ---------------------------------------------------------------------------
+env = environ.Env(DEBUG=(bool, False))
 
+<<<<<<< HEAD
 # Robust pathing to .env file
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+=======
+# Read .env only when the file exists (local dev). On Render the vars are
+# injected directly into os.environ — no .env file is present there.
+_env_file = os.path.join(BASE_DIR, '.env')
+if os.path.isfile(_env_file):
+    environ.Env.read_env(_env_file)
+>>>>>>> 33de52f (production ready: supabase + cloudflare + cloudinary stack)
 
-# SECURITY: Pull these directly from your .env file
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 
-# Environment Detection (Render/Local)
-IS_HEROKU = "RENDER" in os.environ
+# True when running on Render (set RENDER=true in Render dashboard)
+IS_PRODUCTION = "RENDER" in os.environ
 
-ALLOWED_HOSTS = ['*']
+# ---------------------------------------------------------------------------
+# 2. Hosts & CSRF
+# ---------------------------------------------------------------------------
+if DEBUG:
+    ALLOWED_HOSTS = ['*']
+else:
+    _allowed_host = env('ALLOWED_HOST', default=None)
+    if not _allowed_host:
+        raise ImproperlyConfigured(
+            "ALLOWED_HOST environment variable is required when DEBUG=False."
+        )
+    ALLOWED_HOSTS = [_allowed_host, f'www.{_allowed_host}']
+    # Covers both your custom domain (via Cloudflare) and the raw Render URL
+    _render_host = env('RENDER_EXTERNAL_HOSTNAME', default=None)
+    if _render_host:
+        ALLOWED_HOSTS.append(_render_host)
+    CSRF_TRUSTED_ORIGINS = [
+        f'https://{_allowed_host}',
+        f'https://www.{_allowed_host}',
+    ]
 
-# Auth Redirects
-LOGIN_URL = 'login'              
-LOGIN_REDIRECT_URL = 'home'      
+# ---------------------------------------------------------------------------
+# 3. Auth
+# ---------------------------------------------------------------------------
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
-# Application definition
+# ---------------------------------------------------------------------------
+# 4. Apps
+# ---------------------------------------------------------------------------
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+<<<<<<< HEAD
     'cloudinary_storage',  # Must come before staticfiles for Cloudinary
+=======
+    'cloudinary_storage',       # must come before staticfiles
+>>>>>>> 33de52f (production ready: supabase + cloudflare + cloudinary stack)
     'django.contrib.staticfiles',
     'cloudinary',
     'store',
 ]
 
+# ---------------------------------------------------------------------------
+# 5. Middleware
+# ---------------------------------------------------------------------------
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+<<<<<<< HEAD
     'whitenoise.middleware.WhiteNoiseMiddleware', # REQUIRED for serving CSS on Render
+=======
+    'whitenoise.middleware.WhiteNoiseMiddleware',   # right after SecurityMiddleware
+>>>>>>> 33de52f (production ready: supabase + cloudflare + cloudinary stack)
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -54,6 +95,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'core.urls'
 
+# ---------------------------------------------------------------------------
+# 6. Templates
+# ---------------------------------------------------------------------------
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -65,7 +109,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'store.context_processors.cart_count',
-                'store.context_processors.categories_processor', 
+                'store.context_processors.categories_processor',
             ],
         },
     },
@@ -73,28 +117,68 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
+<<<<<<< HEAD
 # 2. Database Configuration
 if not IS_HEROKU:
+=======
+# ---------------------------------------------------------------------------
+# 7. Database
+# ---------------------------------------------------------------------------
+if not IS_PRODUCTION:
+>>>>>>> 33de52f (production ready: supabase + cloudflare + cloudinary stack)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'happy_heavens_db',
-            'USER': 'postgres',
-            'PASSWORD': 'root123',
-            'HOST': 'localhost',
-            'PORT': '5432',
+            'NAME': env('DB_NAME', default='happy_heavens_db'),
+            'USER': env('DB_USER', default='postgres'),
+            'PASSWORD': env('DB_PASSWORD', default=''),
+            'HOST': env('DB_HOST', default='localhost'),
+            'PORT': env('DB_PORT', default='5432'),
         }
     }
 else:
-    # PRODUCTION: Connects to Render Cloud DB
+    # Supabase via pgBouncer connection pooler (port 6543)
+    # conn_max_age=0 is required — pgBouncer handles pooling itself
     DATABASES = {
         'default': dj_database_url.config(
-            default=os.environ.get('DATABASE_URL'),
-            conn_max_age=600
+            default=os.environ.get('DATABASE_URL', ''),
+            conn_max_age=0,
+            ssl_require=True,
         )
     }
 
-# Password validation
+# ---------------------------------------------------------------------------
+# 8. Cache — database-backed for free tier, zero extra services needed
+# ---------------------------------------------------------------------------
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'django_cache_table',
+    }
+}
+
+# ---------------------------------------------------------------------------
+# 9. Security headers
+# ---------------------------------------------------------------------------
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
+
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
+    # Trust Cloudflare's forwarded proto header
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# ---------------------------------------------------------------------------
+# 10. Password validation
+# ---------------------------------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -102,38 +186,82 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# Internationalization
+# ---------------------------------------------------------------------------
+# 11. Internationalisation
+# ---------------------------------------------------------------------------
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# 3. Static & Media Configuration
+# ---------------------------------------------------------------------------
+# 12. Static & Media
+# ---------------------------------------------------------------------------
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
+<<<<<<< HEAD
 # Production Storage settings
 if IS_HEROKU:
     # Standard storage avoids build crashes while WhiteNoise serves files
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
     
     # Use Cloudinary for Media files (images) only in production
+=======
+if IS_PRODUCTION:
+    # WhiteNoise: compressed + cache-busted fingerprinted filenames
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    # Cloudinary for all uploaded media
+>>>>>>> 33de52f (production ready: supabase + cloudflare + cloudinary stack)
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+else:
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
+<<<<<<< HEAD
 # Cloudinary Credentials
+=======
+>>>>>>> 33de52f (production ready: supabase + cloudflare + cloudinary stack)
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': env('CLOUD_NAME', default=''),
     'API_KEY': env('API_KEY', default=''),
     'API_SECRET': env('API_SECRET', default=''),
 }
 
+<<<<<<< HEAD
 # Local Media (Used locally)
+=======
+>>>>>>> 33de52f (production ready: supabase + cloudflare + cloudinary stack)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# 4. Session Settings
-SESSION_COOKIE_AGE = 604800 
-SESSION_SAVE_EVERY_REQUEST = True
+# ---------------------------------------------------------------------------
+# 13. Sessions — optimised to reduce DB writes
+# ---------------------------------------------------------------------------
+SESSION_COOKIE_AGE = 604800          # 7 days
+SESSION_SAVE_EVERY_REQUEST = False   # only save when session data actually changes
 
+<<<<<<< HEAD
+=======
+# ---------------------------------------------------------------------------
+# 14. Email
+# ---------------------------------------------------------------------------
+if DEBUG:
+    EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
+else:
+    EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+
+EMAIL_HOST = env('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = env.int('EMAIL_PORT', default=587)
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
+EMAIL_USE_TLS = True
+
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default=EMAIL_HOST_USER)
+STORE_OWNER_EMAIL = env('STORE_OWNER_EMAIL', default=EMAIL_HOST_USER)
+
+# ---------------------------------------------------------------------------
+# 15. Misc
+# ---------------------------------------------------------------------------
+>>>>>>> 33de52f (production ready: supabase + cloudflare + cloudinary stack)
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

@@ -6,12 +6,14 @@ import copy # <--- 1. NEW IMPORT
 class Cart:
     def __init__(self, request):
         """
-        Initialize the cart.
+        Initialize the cart. Creates a new empty cart if none exists in the session.
+        Handles corrupted session data gracefully.
         """
         self.session = request.session
         cart = self.session.get('session_key')
 
-        if 'session_key' not in request.session:
+        if not isinstance(cart, dict):
+            # Covers both missing key and corrupted/non-dict session data
             cart = self.session['session_key'] = {}
 
         self.cart = cart
@@ -36,38 +38,87 @@ class Cart:
             del self.cart[product_id]
             self.save()
 
+    def update(self, product, quantity):
+        """
+        Set the quantity of a cart item directly.
+        Removes the item if quantity <= 0.
+        """
+        product_id = str(product.id)
+        if product_id in self.cart:
+            if quantity <= 0:
+                self.remove(product)
+            else:
+                self.cart[product_id]['quantity'] = quantity
+                self.save()
+
     def __iter__(self):
         """
         Iterate over the items in the cart and get the products from the database.
+        Filters out products where is_active=False and flags them in self.removed_items.
         """
-        product_ids = self.cart.keys()
+        self.removed_items = []
+        product_ids = list(self.cart.keys())
         products = Product.objects.filter(id__in=product_ids)
-        
-        # <--- 2. THE FIX: Create a 'Deep Copy' of the cart
-        # This creates a safe clone so we don't accidentally write 'Decimals' 
-        # back to the real session.
-        cart = copy.deepcopy(self.cart) 
 
+        # Build a map of active products; collect inactive ones for removal
+        active_products = {}
         for product in products:
-            cart[str(product.id)]['product'] = product
+            if not product.is_active:
+                self.removed_items.append(product)
+                product_id = str(product.id)
+                if product_id in self.cart:
+                    del self.cart[product_id]
+                    self.session.modified = True
+            else:
+                active_products[str(product.id)] = product
+
+        # Deep copy to avoid writing Decimals back to the session
+        cart = copy.deepcopy(self.cart)
+
+        for product_id, product in active_products.items():
+            if product_id in cart:
+                cart[product_id]['product'] = product
 
         for item in cart.values():
-            # Now we can safely convert to Decimal on the clone
+            # Only yield items that have a product attached (i.e. active ones)
+            if 'product' not in item:
+                continue
             item['price'] = Decimal(item['price'])
             item['total_price'] = item['price'] * item['quantity']
             yield item
 
     def __len__(self):
         """
-        Count all items in the cart.
+        Count only active items in the cart.
+        Excludes quantities for products that have been deactivated.
         """
-        return sum(item['quantity'] for item in self.cart.values())
+        active_ids = set(
+            str(pk) for pk in Product.objects.filter(
+                id__in=self.cart.keys(), is_active=True
+            ).values_list('id', flat=True)
+        )
+        return sum(
+            item['quantity']
+            for pid, item in self.cart.items()
+            if pid in active_ids
+        )
 
     def get_total_price(self):
         """
-        Calculate the total cost of items in the cart.
+        Calculate the total cost of active items in the cart.
+        Queries only active products to avoid including deactivated items in the total.
         """
-        return sum(Decimal(item['price']) * item['quantity'] for item in self.cart.values())
+        product_ids = list(self.cart.keys())
+        active_ids = set(
+            str(pk) for pk in Product.objects.filter(
+                id__in=product_ids, is_active=True
+            ).values_list('id', flat=True)
+        )
+        return sum(
+            Decimal(item['price']) * item['quantity']
+            for pid, item in self.cart.items()
+            if pid in active_ids
+        )
 
     def save(self):
         """

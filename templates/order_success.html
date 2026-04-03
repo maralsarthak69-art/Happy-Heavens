@@ -1,23 +1,47 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="h-[70vh] flex flex-col items-center justify-center text-center px-6">
-    <div class="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mb-8 animate-pulse">
+<div class="container mx-auto px-6 py-20 max-w-2xl text-center">
+    <div class="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mb-8 mx-auto animate-pulse">
         <svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 13l4 4L19 7"></path>
         </svg>
     </div>
 
     {% if order.payment_method == 'COD' %}
-        <h1 class="font-serif text-5xl mb-6">Order Confirmed</h1>
-        <p class="text-gray-400 text-[10px] uppercase tracking-[0.3em] max-w-sm mb-12 leading-loose">
-            Your request for Cash on Delivery has been received. Please keep ₹{{ order.total_amount }} ready at the time of delivery.
+        <h1 class="font-serif text-5xl mb-4">Order Confirmed</h1>
+        <p class="text-gray-400 text-[10px] uppercase tracking-[0.3em] max-w-sm mx-auto mb-10 leading-loose">
+            Your Cash on Delivery order has been received. Please keep ₹{{ order.total_amount }} ready at delivery.
         </p>
     {% else %}
-        <h1 class="font-serif text-5xl mb-6">Proof Received</h1>
-        <p class="text-gray-400 text-[10px] uppercase tracking-[0.3em] max-w-sm mb-12 leading-loose">
-            Your payment screenshot for Order #{{ order.id }} is under review. Sarthak will verify it shortly.
+        <h1 class="font-serif text-5xl mb-4">Proof Received</h1>
+        <p class="text-gray-400 text-[10px] uppercase tracking-[0.3em] max-w-sm mx-auto mb-10 leading-loose">
+            Your payment screenshot is under review. We'll confirm your order shortly.
         </p>
     {% endif %}
+
+    <div class="text-left border border-gray-100 rounded-sm mb-10">
+        <div class="bg-gray-50 px-6 py-4 flex justify-between items-center">
+            <span class="text-[10px] uppercase tracking-widest text-gray-400">Order #{{ order.id }}</span>
+            <span class="text-[10px] uppercase tracking-widest text-gray-400">{{ order.payment_method }}</span>
+        </div>
+
+        <div class="divide-y divide-gray-100">
+            {% for item in items %}
+            <div class="px-6 py-4 flex justify-between text-sm">
+                <span class="text-gray-700">
+                    {% if item.product %}{{ item.product.name }}{% else %}(Product removed){% endif %}
+                    <span class="text-gray-400 text-xs ml-2">× {{ item.quantity }}</span>
+                </span>
+                <span class="text-gray-700">₹{{ item.price }}</span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="px-6 py-4 flex justify-between border-t border-gray-200">
+            <span class="text-xs uppercase tracking-widest font-bold">Total</span>
+            <span class="text-sm font-bold">₹{{ order.total_amount }}</span>
+        </div>
+    </div>
 
     <a href="{% url 'home' %}" class="bg-black text-white px-12 py-4 rounded-full uppercase text-[10px] font-bold tracking-[0.2em] hover:bg-[#FB7185] transition-all">
         Continue Shopping

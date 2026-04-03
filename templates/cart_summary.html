@@ -10,6 +10,17 @@
         </h1>
     </div>
 
+    {% if cart.removed_items %}
+        <div class="mb-8 bg-amber-50 border border-amber-200 rounded-sm px-6 py-4 text-sm text-amber-800">
+            <p class="font-semibold mb-1">Some items were removed from your bag</p>
+            <ul class="list-disc list-inside space-y-1">
+                {% for product in cart.removed_items %}
+                    <li>{{ product.name }} is no longer available and has been removed.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
     {% if cart|length == 0 %}
         <div class="text-center py-20">
             <p class="text-gray-400 font-serif italic text-xl mb-8">"Your bag is currently empty."</p>
@@ -40,8 +51,12 @@
                                 
                                 <div>
                                     <h3 class="font-serif text-lg text-black leading-none mb-1">{{ item.product.name }}</h3>
-                                    <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-2">Qty: {{ item.quantity }}</p>
-                                    <a href="{% url 'remove_from_cart' item.product.id %}" class="text-[9px] text-red-400 uppercase tracking-widest hover:text-red-600 underline">Remove</a>
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">₹{{ item.price }} × {{ item.quantity }}</p>
+                                    <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-2">Subtotal: ₹{{ item.total_price }}</p>
+                                    <form method="post" action="{% url 'remove_from_cart' item.product.id %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="text-[9px] text-red-400 uppercase tracking-widest hover:text-red-600 underline bg-transparent border-none p-0 cursor-pointer">Remove</button>
+                                    </form>
                                 </div>
                             </div>
 

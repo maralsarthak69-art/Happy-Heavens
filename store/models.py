@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-class order(models.Model):
+class Order(models.Model):
     PAYMENT_METHODS = (
         ('COD', 'Cash on Delivery'),
         ('QR', 'QR Code Transfer'),
@@ -24,22 +24,34 @@ class order(models.Model):
     payment_screenshot = models.ImageField(upload_to='payment_proofs/', blank=True, null=True)
 
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
+    city = models.CharField(max_length=100, default='')
+    pincode = models.CharField(max_length=10, default='')
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['status']),
+            models.Index(fields=['created_at']),
+        ]
+
     def __str__(self):
-        return f"Order #{self.id} - {self.user.username} ({self.status})"
+        return f"Order #{self.id} - {self.full_name}"
     
 class OrderItem(models.Model):
-    order = models.ForeignKey(order, on_delete=models.CASCADE, related_name='items')
-    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, blank=True)
     quantity = models.PositiveIntegerField(default=1)
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
+    @property
+    def subtotal(self):
+        return self.price * self.quantity
+
     def __str__(self):
-        return f"{self.quantity} x {self.product.name} for Order #{self.order.id}"
+        return f"OrderItem {self.id} (Order #{self.order_id})"
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
@@ -62,6 +74,10 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     class Meta:
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['is_active']),
+            models.Index(fields=['category']),
+        ]
     
     def __str__(self):
         return self.name
@@ -81,4 +97,4 @@ class CustomRequest(models.Model):
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Request from {self.name}"
+        return f"CustomRequest from {self.name}"

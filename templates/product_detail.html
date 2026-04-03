@@ -26,14 +26,28 @@
                 <h1 class="font-serif text-4xl md:text-5xl text-black leading-none mb-4 tracking-tight">
                     {{ product.name }}
                 </h1>
+                {% if out_of_stock %}
+                    <span class="inline-block bg-gray-800 text-white text-[9px] font-bold px-4 py-1.5 uppercase tracking-[0.3em] mb-3">
+                        Out of Stock
+                    </span>
+                {% endif %}
                 <p class="text-xl font-medium text-gray-900 tracking-wide">₹{{ product.price }}</p>
                 <p class="text-[10px] text-gray-400 mt-2 uppercase tracking-widest">Tax included.</p>
             </div>
 
             <div class="space-y-4">
-                <a href="{% url 'add_to_cart' product.id %}" class="block text-center w-full bg-[#FB7185] text-white uppercase text-[11px] font-bold tracking-[0.2em] py-5 rounded-sm hover:bg-[#F43F5E] transition-all shadow-lg hover:shadow-xl active:scale-95">
-                    Add to Cart — ₹{{ product.price }}
-                </a>
+                {% if out_of_stock %}
+                    <div class="block text-center w-full bg-gray-200 text-gray-500 uppercase text-[11px] font-bold tracking-[0.2em] py-5 rounded-sm cursor-not-allowed">
+                        Out of Stock
+                    </div>
+                {% else %}
+                    <form method="post" action="{% url 'add_to_cart' product.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="block text-center w-full bg-[#FB7185] text-white uppercase text-[11px] font-bold tracking-[0.2em] py-5 rounded-sm hover:bg-[#F43F5E] transition-all shadow-lg hover:shadow-xl active:scale-95">
+                            Add to Cart — ₹{{ product.price }}
+                        </button>
+                    </form>
+                {% endif %}
                 <p class="text-center text-[10px] text-gray-400">Secure checkout powered by Happy Heavens.</p>
             </div>
 

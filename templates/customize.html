@@ -33,16 +33,19 @@
                     <div>
                         <label class="block text-[9px] uppercase tracking-widest text-gray-400 mb-2">Who are we creating for?</label>
                         {{ form.name }}
+                        {% if form.name.errors %}<p class="text-red-500 text-[10px] mt-1">{{ form.name.errors|join:", " }}</p>{% endif %}
                     </div>
 
                     <div>
                         <label class="block text-[9px] uppercase tracking-widest text-gray-400 mb-2">WhatsApp Contact</label>
                         {{ form.phone_number }}
+                        {% if form.phone_number.errors %}<p class="text-red-500 text-[10px] mt-1">{{ form.phone_number.errors|join:", " }}</p>{% endif %}
                     </div>
 
                     <div>
                         <label class="block text-[9px] uppercase tracking-widest text-gray-400 mb-2">The Idea</label>
                         {{ form.idea_description }}
+                        {% if form.idea_description.errors %}<p class="text-red-500 text-[10px] mt-1">{{ form.idea_description.errors|join:", " }}</p>{% endif %}
                     </div>
 
                     <div class="p-6 border border-dashed border-gray-300 bg-gray-50/50 rounded-sm text-center">
