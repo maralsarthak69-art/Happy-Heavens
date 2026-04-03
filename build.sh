@@ -3,6 +3,8 @@ set -o errexit
 
 pip install -r requirements.txt
 
+# Clear any stale staticfiles before collecting fresh
+rm -rf staticfiles/
 python manage.py collectstatic --noinput
 
 # Use DIRECT_URL for migrations if set (bypasses pgBouncer transaction mode limitation)
