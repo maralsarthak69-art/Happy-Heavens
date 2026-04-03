@@ -118,6 +118,35 @@
             </div>
         {% endfor %}
     </div>
+
+    {% if page_obj.has_other_pages %}
+    <div class="flex items-center justify-center space-x-2 mb-32">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="px-5 py-3 border border-gray-200 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-black hover:text-white hover:border-black transition-all duration-300">
+                ← Prev
+            </a>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <span class="px-5 py-3 bg-black text-white text-[10px] uppercase tracking-[0.2em] font-bold">
+                    {{ num }}
+                </span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a href="?page={{ num }}" class="px-5 py-3 border border-gray-200 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-black hover:text-white hover:border-black transition-all duration-300">
+                    {{ num }}
+                </a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="px-5 py-3 border border-gray-200 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-black hover:text-white hover:border-black transition-all duration-300">
+                Next →
+            </a>
+        {% endif %}
+    </div>
+    {% endif %}
+
 </div>
 
 <section class="relative w-full py-24 bg-[#FAFAFA] overflow-hidden my-20 border-t border-gray-100">

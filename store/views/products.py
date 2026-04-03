@@ -5,17 +5,24 @@ from store.models import Product, Category
 
 
 def product_list(request):
-    """Home page — hero slider + full product grid."""
-    products = list(
+    """Home page — hero slider + paginated product grid (10 per page)."""
+    qs = (
         Product.objects.filter(is_active=True)
         .select_related('category')
         .prefetch_related('images')
         .order_by('-created_at')
     )
+    # New arrivals for hero slider — always top 5
+    new_arrivals = list(qs[:5])
+
+    paginator = Paginator(qs, 10)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
     return render(request, 'index.html', {
-        'products': products,
-        'product_count': len(products),
-        'new_arrivals': products[:5],
+        'products': page_obj,
+        'page_obj': page_obj,
+        'product_count': qs.count(),
+        'new_arrivals': new_arrivals,
     })
 
 
