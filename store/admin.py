@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
-from .models import Category, Product, ProductImage, CustomRequest, Order, OrderItem
+from .models import Category, Product, ProductImage, CustomRequest, Order, OrderItem, NewsletterSubscriber
 
 # 1. Image Gallery Setup
 # This allows you to upload multiple images INSIDE the Product page
@@ -79,3 +79,10 @@ class CustomRequestAdmin(admin.ModelAdmin):
             return mark_safe(f'<img src="{obj.reference_image.url}" width="80" style="border-radius: 4px;"/>')
         return "No Image"
     reference_image_thumbnail.short_description = 'Reference Image'
+
+
+@admin.register(NewsletterSubscriber)
+class NewsletterSubscriberAdmin(admin.ModelAdmin):
+    list_display = ['email', 'subscribed_at']
+    readonly_fields = ['subscribed_at']
+    search_fields = ['email']
