@@ -75,6 +75,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'store.middleware.AdminSessionTimeoutMiddleware',  # admin timeout after 2hrs inactivity
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -201,8 +202,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # ---------------------------------------------------------------------------
 # 13. Sessions
 # ---------------------------------------------------------------------------
-SESSION_COOKIE_AGE = 604800
-SESSION_SAVE_EVERY_REQUEST = False
+SESSION_COOKIE_AGE = 604800          # 7 days for regular users
+SESSION_SAVE_EVERY_REQUEST = False   # only save when session data actually changes
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+# Admin session timeout — 2 hours of inactivity logs out staff/superusers
+ADMIN_SESSION_TIMEOUT = 60 * 60 * 2  # 2 hours in seconds
 
 # ---------------------------------------------------------------------------
 # 14. Email
