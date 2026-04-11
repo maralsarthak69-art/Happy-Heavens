@@ -16,7 +16,9 @@ services:
       - key: ALLOWED_HOST
         sync: false          # your domain e.g. happyheavens.com
       - key: DATABASE_URL
-        sync: false          # Supabase pooler URL
+        sync: false          # Supabase pooler URL (port 6543)
+      - key: DIRECT_URL
+        sync: false          # Supabase direct connection string (port 5432, bypasses pgBouncer for DDL)
       - key: CLOUD_NAME
         sync: false
       - key: API_KEY

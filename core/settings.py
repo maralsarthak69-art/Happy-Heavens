@@ -42,6 +42,8 @@ else:
         f'https://{_allowed_host}',
         f'https://www.{_allowed_host}',
     ]
+    if _render_host:
+        CSRF_TRUSTED_ORIGINS.append(f'https://{_render_host}')
 
 # ---------------------------------------------------------------------------
 # 3. Auth
