@@ -1,8 +1,13 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block seo %}
+<title>{% if query %}Search: "{{ query }}"{% else %}Search{% endif %} | Happy Heavens</title>
+<meta name="robots" content="noindex, follow">
+{% endblock seo %}
+
 {% block content %}
-<div class="container mx-auto px-8 py-24">
+<div class="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
     <div class="mb-16 border-b border-gray-100 pb-10">
         <h1 class="font-serif text-5xl md:text-7xl tracking-tighter lowercase">
             Search <br> <span class="text-gray-400">Results</span>

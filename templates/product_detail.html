@@ -1,7 +1,25 @@
+
 {% extends 'base.html' %}
 
+{% block seo %}
+<title>{{ product.name }} | Happy Heavens</title>
+<meta name="description" content="{{ product.description|truncatewords:25|default:'Handcrafted with love at Happy Heavens, Pune.' }}">
+<link rel="canonical" href="https://happyheavens.in/product/{{ product.slug }}/">
+{% endblock seo %}
+
+{% block og %}
+<meta property="og:type" content="product">
+<meta property="og:site_name" content="Happy Heavens">
+<meta property="og:title" content="{{ product.name }} | Happy Heavens">
+<meta property="og:description" content="{{ product.description|truncatewords:25|default:'Handcrafted with love at Happy Heavens, Pune.' }}">
+<meta property="og:url" content="https://happyheavens.in/product/{{ product.slug }}/">
+{% with img=product.images.all.0 %}{% if img %}<meta property="og:image" content="{{ img.image.url }}">{% endif %}{% endwith %}
+<meta property="product:price:amount" content="{{ product.price }}">
+<meta property="product:price:currency" content="INR">
+{% endblock og %}
+
 {% block content %}
-<div class="container mx-auto px-6 md:px-12 py-20">
+<div class="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-12 py-20">
     <div class="flex flex-col md:flex-row gap-16">
         
         <div class="w-full md:w-3/5 space-y-4">

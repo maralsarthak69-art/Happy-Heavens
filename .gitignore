@@ -11,3 +11,7 @@ staticfiles/
 .vscode/
 *.egg-info/
 dist/
+node_modules/
+package.json
+package-lock.json
+tests/

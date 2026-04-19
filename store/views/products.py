@@ -15,7 +15,7 @@ def product_list(request):
     # New arrivals for hero slider — always top 5
     new_arrivals = list(qs[:5])
 
-    paginator = Paginator(qs, 10)
+    paginator = Paginator(qs, 12)
     page_obj = paginator.get_page(request.GET.get('page'))
 
     return render(request, 'index.html', {

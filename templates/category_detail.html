@@ -1,7 +1,13 @@
 {% extends 'base.html' %}
 
+{% block seo %}
+<title>{{ category_name }} | Happy Heavens</title>
+<meta name="description" content="Shop our {{ category_name }} collection — handcrafted gifts and luxury essentials from Happy Heavens, Pune.">
+<link rel="canonical" href="https://happyheavens.in/category/{{ category.slug }}/">
+{% endblock seo %}
+
 {% block content %}
-<div class="container mx-auto px-8 py-20 min-h-[60vh]">
+<div class="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-20 min-h-[60vh]">
     
     <div class="border-b border-gray-100 pb-8 mb-12 flex items-end justify-between">
         <div>

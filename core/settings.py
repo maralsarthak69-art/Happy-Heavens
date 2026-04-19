@@ -229,7 +229,15 @@ DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default=EMAIL_HOST_USER)
 STORE_OWNER_EMAIL = env('STORE_OWNER_EMAIL', default=EMAIL_HOST_USER)
 
 # ---------------------------------------------------------------------------
-# 15. Misc
+# 15. WhatsApp Notifications (Twilio)
+# ---------------------------------------------------------------------------
+TWILIO_ACCOUNT_SID = env('TWILIO_ACCOUNT_SID', default='')
+TWILIO_AUTH_TOKEN = env('TWILIO_AUTH_TOKEN', default='')
+TWILIO_WHATSAPP_FROM = env('TWILIO_WHATSAPP_FROM', default='')  # Format: whatsapp:+14155238886
+ADMIN_WHATSAPP_NUMBER = env('ADMIN_WHATSAPP_NUMBER', default='')  # Format: whatsapp:+919876543210
+
+# ---------------------------------------------------------------------------
+# 16. Misc
 # ---------------------------------------------------------------------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

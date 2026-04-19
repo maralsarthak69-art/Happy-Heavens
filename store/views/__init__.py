@@ -8,6 +8,7 @@ from .customization import customize_idea, custom_request_success
 from .search import search
 from .errors import custom_404, custom_403, custom_500
 from .newsletter import newsletter_subscribe
+from .seo import robots_txt, sitemap_xml
 
 __all__ = [
     'product_list', 'product_detail', 'product_detail_by_pk', 'category_detail',
@@ -19,4 +20,5 @@ __all__ = [
     'search',
     'custom_404', 'custom_403', 'custom_500',
     'newsletter_subscribe',
+    'robots_txt', 'sitemap_xml',
 ]

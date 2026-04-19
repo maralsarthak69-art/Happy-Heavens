@@ -4,11 +4,15 @@ Views call this service; they never touch stock or Order creation directly.
 This makes it trivial to add coupons, loyalty points, or a new payment
 method later without touching views.
 """
+import logging
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 
 from store.models import Order, OrderItem, Product
 from store.exceptions import InsufficientStockError
+from store.services.whatsapp_service import notify_admin_new_order
+
+logger = logging.getLogger(__name__)
 
 
 def create_order(*, user, form_data: dict, cart_items: list, total, payment_screenshot=None) -> Order:
@@ -64,5 +68,12 @@ def create_order(*, user, form_data: dict, cart_items: list, total, payment_scre
             )
             for item in cart_items
         ])
+
+    # --- 4. Send WhatsApp notification to admin (outside transaction) ---
+    try:
+        notify_admin_new_order(order)
+    except Exception as e:
+        # Log but don't fail the order if notification fails
+        logger.error(f"Failed to send WhatsApp notification for Order #{order.id}: {e}")
 
     return order

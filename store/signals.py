@@ -4,6 +4,9 @@ from django.core.mail import send_mail
 from django.core.cache import cache
 from django.conf import settings
 from .models import Order, CustomRequest, Category, Product
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # Track previous status to detect changes
@@ -21,11 +24,12 @@ def capture_previous_order_status(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Order)
 def notify_customer_on_status_change(sender, instance, created, **kwargs):
-    """Send email to customer when Order status changes (status updates only, not creation)."""
+    """Send email and WhatsApp to customer when Order status changes."""
     previous_status = getattr(instance, '_previous_status', None)
 
-    # Only email on status change — not on creation, not when status is unchanged
+    # Only notify on status change — not on creation, not when status is unchanged
     if not created and previous_status is not None and previous_status != instance.status:
+        # Send email notification
         customer_email = instance.user.email
         if customer_email:
             subject = f"Happy Heavens — Order #{instance.id} Status Update"
@@ -42,6 +46,13 @@ def notify_customer_on_status_change(sender, instance, created, **kwargs):
                 recipient_list=[customer_email],
                 fail_silently=True,
             )
+        
+        # Send WhatsApp notification to customer
+        try:
+            from store.services.whatsapp_service import notify_customer_status_update
+            notify_customer_status_update(instance, previous_status, instance.status)
+        except Exception as e:
+            logger.error(f"Failed to send WhatsApp status update for Order #{instance.id}: {e}")
 
 
 @receiver(post_save, sender=CustomRequest)

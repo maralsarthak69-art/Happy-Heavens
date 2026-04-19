@@ -19,6 +19,8 @@ from store.views import (
     search,
     # Newsletter
     newsletter_subscribe,
+    # SEO
+    robots_txt, sitemap_xml,
 )
 
 urlpatterns = [
@@ -51,4 +53,8 @@ urlpatterns = [
 
     # --- Newsletter ---
     path('newsletter/subscribe/', newsletter_subscribe, name='newsletter_subscribe'),
+
+    # --- SEO ---
+    path('robots.txt', robots_txt, name='robots_txt'),
+    path('sitemap.xml', sitemap_xml, name='sitemap_xml'),
 ]
