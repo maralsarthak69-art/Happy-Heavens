@@ -17,4 +17,14 @@ else
     python manage.py createcachetable
 fi
 
+# Clear Django cache to ensure fresh templates
+python -c "
+import os, django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
+django.setup()
+from django.core.cache import cache
+cache.clear()
+print('✅ Cache cleared during build')
+" || echo "⚠️ Could not clear cache"
+
 python manage.py createsuperuser --no-input || true
