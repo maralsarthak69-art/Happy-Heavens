@@ -19,6 +19,9 @@ from store.views import (
     # Dashboard
     dashboard, dashboard_update_status,
     dashboard_stock, dashboard_update_stock,
+    export_orders_csv,
+    dashboard_products, dashboard_update_product,
+    dashboard_guide,
 )
 
 urlpatterns = [
@@ -57,8 +60,12 @@ urlpatterns = [
     path('sitemap.xml', sitemap_xml, name='sitemap_xml'),
 
     # --- Owner Dashboard ---
-    path('dashboard/', dashboard, name='dashboard'),
-    path('dashboard/order/<int:order_id>/update/', dashboard_update_status, name='dashboard_update_status'),
-    path('dashboard/stock/', dashboard_stock, name='dashboard_stock'),
-    path('dashboard/stock/<int:product_id>/update/', dashboard_update_stock, name='dashboard_update_stock'),
+    path('dashboard/',                                    dashboard,                name='dashboard'),
+    path('dashboard/order/<int:order_id>/update/',        dashboard_update_status,  name='dashboard_update_status'),
+    path('dashboard/stock/',                              dashboard_stock,           name='dashboard_stock'),
+    path('dashboard/stock/<int:product_id>/update/',      dashboard_update_stock,   name='dashboard_update_stock'),
+    path('dashboard/export/orders.csv',                   export_orders_csv,        name='export_orders_csv'),
+    path('dashboard/products/',                           dashboard_products,        name='dashboard_products'),
+    path('dashboard/products/<int:product_id>/update/',   dashboard_update_product, name='dashboard_update_product'),
+    path('dashboard/guide/',                              dashboard_guide,           name='dashboard_guide'),
 ]

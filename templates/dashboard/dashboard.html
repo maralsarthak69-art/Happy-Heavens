@@ -281,9 +281,17 @@
                class="inline-flex items-center gap-2 bg-gray-900 hover:bg-pink-600 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
                 ➕ Add New Product
             </a>
+            <a href="{% url 'dashboard_products' %}"
+               class="inline-flex items-center gap-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-800 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
+                ✏️ Edit Products
+            </a>
             <a href="{% url 'dashboard_stock' %}"
                class="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
                 📦 Manage Stock
+            </a>
+            <a href="{% url 'export_orders_csv' %}"
+               class="inline-flex items-center gap-2 bg-green-100 hover:bg-green-200 text-green-800 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
+                📥 Download Orders (CSV)
             </a>
             <a href="/admin/store/order/?status__exact=PENDING"
                class="inline-flex items-center gap-2 bg-amber-100 hover:bg-amber-200 text-amber-800 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
@@ -293,13 +301,9 @@
                class="inline-flex items-center gap-2 bg-pink-100 hover:bg-pink-200 text-pink-800 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
                 💡 All Custom Requests
             </a>
-            <a href="/admin/store/product/?stock__lte=3"
-               class="inline-flex items-center gap-2 bg-orange-100 hover:bg-orange-200 text-orange-800 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
-                ⚠️ Low Stock Products
-            </a>
-            <a href="/admin/store/newslettersubscriber/"
-               class="inline-flex items-center gap-2 bg-blue-100 hover:bg-blue-200 text-blue-800 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
-                📧 Newsletter Subscribers
+            <a href="{% url 'dashboard_guide' %}"
+               class="inline-flex items-center gap-2 bg-sky-100 hover:bg-sky-200 text-sky-800 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
+                📖 How-To Guide
             </a>
         </div>
     </div>

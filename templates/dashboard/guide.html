@@ -1,0 +1,405 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Run Your Store — Happy Heavens</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .step-number {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 28px; height: 28px; border-radius: 50%;
+            background: #111827; color: white;
+            font-size: 12px; font-weight: 700; flex-shrink: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<!-- ── Top bar ──────────────────────────────────────────────────────────── -->
+<header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <a href="{% url 'dashboard' %}" class="text-gray-400 hover:text-gray-700 text-sm transition-colors">
+                ← Dashboard
+            </a>
+            <span class="text-gray-300">|</span>
+            <span class="text-sm font-semibold text-gray-900">📖 How to Run Your Store</span>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-3xl mx-auto px-4 sm:px-6 py-10 space-y-10">
+
+    <!-- ── Welcome ──────────────────────────────────────────────────────── -->
+    <div class="bg-gradient-to-br from-pink-50 to-white rounded-2xl border border-pink-100 p-8">
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">Welcome to your store guide 🌸</h1>
+        <p class="text-gray-600 leading-relaxed">
+            This page explains everything you need to know to run Happy Heavens day-to-day.
+            You don't need any technical knowledge — just follow the steps below.
+            Bookmark this page so you can always come back to it.
+        </p>
+    </div>
+
+    <!-- ── Table of contents ────────────────────────────────────────────── -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <h2 class="font-bold text-gray-900 mb-4">What's in this guide</h2>
+        <ol class="space-y-2 text-sm text-gray-600">
+            <li><a href="#logging-in"     class="text-indigo-600 hover:underline">1. How to log in</a></li>
+            <li><a href="#dashboard"      class="text-indigo-600 hover:underline">2. Understanding your dashboard</a></li>
+            <li><a href="#orders"         class="text-indigo-600 hover:underline">3. How to process an order step by step</a></li>
+            <li><a href="#statuses"       class="text-indigo-600 hover:underline">4. What each order status means</a></li>
+            <li><a href="#custom"         class="text-indigo-600 hover:underline">5. How to handle a custom request</a></li>
+            <li><a href="#add-product"    class="text-indigo-600 hover:underline">6. How to add a new product</a></li>
+            <li><a href="#edit-product"   class="text-indigo-600 hover:underline">7. How to edit a product</a></li>
+            <li><a href="#stock"          class="text-indigo-600 hover:underline">8. How to restock a product</a></li>
+            <li><a href="#export"         class="text-indigo-600 hover:underline">9. How to download your orders as a spreadsheet</a></li>
+            <li><a href="#tips"           class="text-indigo-600 hover:underline">10. Useful tips</a></li>
+        </ol>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <!-- 1. LOGGING IN -->
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <section id="logging-in" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+        <h2 class="text-lg font-bold text-gray-900">1. How to log in</h2>
+        <ol class="space-y-3">
+            <li class="flex gap-3">
+                <span class="step-number">1</span>
+                <span class="text-sm text-gray-700 pt-0.5">Go to <strong>your website address</strong> and add <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">/login/</code> at the end — for example: <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">happy-heavens.onrender.com/login/</code></span>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">2</span>
+                <span class="text-sm text-gray-700 pt-0.5">Enter your username and password, then click <strong>Log In</strong>.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">3</span>
+                <span class="text-sm text-gray-700 pt-0.5">After logging in, go to <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">/dashboard/</code> — this is your home base for managing everything.</span>
+            </li>
+        </ol>
+        <div class="bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-sm text-amber-800">
+            💡 <strong>Tip:</strong> Bookmark the dashboard page so you can open it directly next time.
+        </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <!-- 2. DASHBOARD -->
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <section id="dashboard" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+        <h2 class="text-lg font-bold text-gray-900">2. Understanding your dashboard</h2>
+        <p class="text-sm text-gray-600">When you open the dashboard, you'll see:</p>
+        <ul class="space-y-3 text-sm text-gray-700">
+            <li class="flex gap-3">
+                <span class="text-lg">📊</span>
+                <span><strong>Stat cards at the top</strong> — today's orders, how many are pending, how many are confirmed, your total revenue from delivered orders, and today's custom requests.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="text-lg">⚠️</span>
+                <span><strong>Low stock warning</strong> — if any product has 3 or fewer units left, it shows up here in orange. Click it to go restock.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="text-lg">🛍️</span>
+                <span><strong>Recent orders</strong> — the last 20 orders. Each one shows the customer's name, phone, what they ordered, and the total. You can update the status and add notes right here.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="text-lg">💡</span>
+                <span><strong>Custom requests</strong> — the last 10 custom requests from customers. Shows their name, phone, and what they want.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="text-lg">⚡</span>
+                <span><strong>Quick action buttons</strong> at the bottom — shortcuts to add a product, edit products, manage stock, download orders, and more.</span>
+            </li>
+        </ul>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <!-- 3. PROCESSING AN ORDER -->
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <section id="orders" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+        <h2 class="text-lg font-bold text-gray-900">3. How to process an order step by step</h2>
+        <p class="text-sm text-gray-600">When a customer places an order, here's exactly what to do:</p>
+
+        <ol class="space-y-4">
+            <li class="flex gap-3">
+                <span class="step-number">1</span>
+                <div class="text-sm text-gray-700 pt-0.5">
+                    <strong>Check the payment.</strong>
+                    If the customer paid by QR, you'll see a <em>"View proof ↗"</em> link next to the order.
+                    Click it to see their payment screenshot. Verify the amount matches the order total.
+                    If they chose Cash on Delivery, you'll collect payment when you deliver.
+                </div>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">2</span>
+                <div class="text-sm text-gray-700 pt-0.5">
+                    <strong>Confirm the order.</strong>
+                    Once you're happy with the payment (or it's COD), change the status to
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">✅ Confirmed</span>
+                    and click <strong>Save</strong>.
+                    The customer will automatically get a WhatsApp message and email saying their order is confirmed.
+                </div>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">3</span>
+                <div class="text-sm text-gray-700 pt-0.5">
+                    <strong>Prepare the order.</strong>
+                    Make the product. You can write a note to yourself in the <em>Private Notes</em> box —
+                    for example: <em>"Preparing, will deliver Thursday"</em>. Customers never see this.
+                </div>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">4</span>
+                <div class="text-sm text-gray-700 pt-0.5">
+                    <strong>When you're on the way to deliver</strong>, change the status to
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">🚚 Out for Delivery</span>.
+                    The customer gets notified automatically.
+                </div>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">5</span>
+                <div class="text-sm text-gray-700 pt-0.5">
+                    <strong>After delivery</strong>, change the status to
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">🎉 Delivered</span>.
+                    Done! The order is complete.
+                </div>
+            </li>
+        </ol>
+
+        <div class="bg-green-50 border border-green-100 rounded-xl px-4 py-3 text-sm text-green-800">
+            ✅ <strong>Remember:</strong> Every time you change the status, the customer automatically gets a WhatsApp message and email. You don't need to contact them manually.
+        </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <!-- 4. ORDER STATUSES -->
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <section id="statuses" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+        <h2 class="text-lg font-bold text-gray-900">4. What each order status means</h2>
+        <div class="space-y-3">
+            <div class="flex items-start gap-4 p-3 rounded-xl bg-amber-50 border border-amber-100">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 whitespace-nowrap flex-shrink-0">⏳ Pending</span>
+                <p class="text-sm text-gray-700">A new order just came in. You haven't done anything yet. <strong>Check the payment and then confirm or reject it.</strong></p>
+            </div>
+            <div class="flex items-start gap-4 p-3 rounded-xl bg-blue-50 border border-blue-100">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 whitespace-nowrap flex-shrink-0">✅ Confirmed</span>
+                <p class="text-sm text-gray-700">You've accepted the order and verified the payment. <strong>Now prepare the product.</strong></p>
+            </div>
+            <div class="flex items-start gap-4 p-3 rounded-xl bg-purple-50 border border-purple-100">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 whitespace-nowrap flex-shrink-0">🚚 Out for Delivery</span>
+                <p class="text-sm text-gray-700">The product is on its way to the customer. <strong>Set this when you leave to deliver.</strong></p>
+            </div>
+            <div class="flex items-start gap-4 p-3 rounded-xl bg-green-50 border border-green-100">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 whitespace-nowrap flex-shrink-0">🎉 Delivered</span>
+                <p class="text-sm text-gray-700">The customer has received their order. <strong>Set this after successful delivery. Order is complete.</strong></p>
+            </div>
+            <div class="flex items-start gap-4 p-3 rounded-xl bg-red-50 border border-red-100">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 whitespace-nowrap flex-shrink-0">❌ Rejected</span>
+                <p class="text-sm text-gray-700">The payment failed, was fake, or you couldn't fulfil the order. <strong>Use this to cancel an order.</strong> The customer will be notified.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <!-- 5. CUSTOM REQUESTS -->
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <section id="custom" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+        <h2 class="text-lg font-bold text-gray-900">5. How to handle a custom request</h2>
+        <p class="text-sm text-gray-600">When a customer fills in the "Customize Your Ideas" form on the website, you get a notification email. Here's what to do:</p>
+        <ol class="space-y-3">
+            <li class="flex gap-3">
+                <span class="step-number">1</span>
+                <span class="text-sm text-gray-700 pt-0.5">Open your dashboard. You'll see the request in the <strong>Custom Requests</strong> section on the right side.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">2</span>
+                <span class="text-sm text-gray-700 pt-0.5">Read what the customer wants. If they uploaded a reference photo, click it to see it full size.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">3</span>
+                <span class="text-sm text-gray-700 pt-0.5"><strong>Call or WhatsApp the customer</strong> on the phone number shown. Tap the green phone number — it opens WhatsApp directly.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">4</span>
+                <span class="text-sm text-gray-700 pt-0.5">Discuss the details, agree on a price, and arrange payment and delivery directly with them.</span>
+            </li>
+        </ol>
+        <div class="bg-pink-50 border border-pink-100 rounded-xl px-4 py-3 text-sm text-pink-800">
+            💡 Custom requests don't go through the normal order system — they're handled personally between you and the customer.
+        </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <!-- 6. ADD A PRODUCT -->
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <section id="add-product" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+        <h2 class="text-lg font-bold text-gray-900">6. How to add a new product</h2>
+        <ol class="space-y-3">
+            <li class="flex gap-3">
+                <span class="step-number">1</span>
+                <span class="text-sm text-gray-700 pt-0.5">From the dashboard, click <strong>"➕ Add New Product"</strong>. This opens the product form.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">2</span>
+                <span class="text-sm text-gray-700 pt-0.5">Fill in the <strong>Product Name</strong>. The URL Name below it fills itself automatically — don't change it.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">3</span>
+                <span class="text-sm text-gray-700 pt-0.5">Choose the <strong>Category</strong> (e.g. Bouquets, Hampers).</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">4</span>
+                <span class="text-sm text-gray-700 pt-0.5">Write a <strong>Description</strong> — what it's made of, what occasion it's for, size, etc.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">5</span>
+                <span class="text-sm text-gray-700 pt-0.5">Set the <strong>Price</strong> in rupees and the <strong>Stock</strong> (how many you have ready).</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">6</span>
+                <span class="text-sm text-gray-700 pt-0.5">Scroll down to <strong>📷 Product Photos</strong>. Click <strong>Choose File</strong> to upload photos. You can add multiple photos — the first one is the main photo customers see.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">7</span>
+                <span class="text-sm text-gray-700 pt-0.5">Make sure <strong>"Visible on website"</strong> is ticked, then click <strong>Save</strong> at the bottom.</span>
+            </li>
+        </ol>
+        <div class="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 text-sm text-blue-800">
+            📸 <strong>Photo tip:</strong> Use clear, well-lit photos with a clean background. The better the photo, the more customers will buy.
+        </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <!-- 7. EDIT A PRODUCT -->
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <section id="edit-product" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+        <h2 class="text-lg font-bold text-gray-900">7. How to edit a product</h2>
+        <ol class="space-y-3">
+            <li class="flex gap-3">
+                <span class="step-number">1</span>
+                <span class="text-sm text-gray-700 pt-0.5">From the dashboard, click <strong>"✏️ Edit Products"</strong>.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">2</span>
+                <span class="text-sm text-gray-700 pt-0.5">Find the product you want to change and click on it to expand the edit form.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">3</span>
+                <span class="text-sm text-gray-700 pt-0.5">Change the name, price, stock, description, or category as needed.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">4</span>
+                <span class="text-sm text-gray-700 pt-0.5">To <strong>hide a product</strong> without deleting it, untick <strong>"Show on website"</strong>. Customers won't see it but it stays in your system.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">5</span>
+                <span class="text-sm text-gray-700 pt-0.5">Click <strong>Save Changes</strong>.</span>
+            </li>
+        </ol>
+        <div class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700">
+            📷 <strong>To add or change photos</strong>, click <em>"Open full edit (for photos) ↗"</em> at the bottom of the edit form. This opens the full admin where you can manage photos.
+        </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <!-- 8. RESTOCK -->
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <section id="stock" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+        <h2 class="text-lg font-bold text-gray-900">8. How to restock a product</h2>
+        <p class="text-sm text-gray-600">Stock goes down automatically when customers order. When you make more products, update the stock so customers can order again.</p>
+        <ol class="space-y-3">
+            <li class="flex gap-3">
+                <span class="step-number">1</span>
+                <span class="text-sm text-gray-700 pt-0.5">From the dashboard, click <strong>"📦 Manage Stock"</strong>.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">2</span>
+                <span class="text-sm text-gray-700 pt-0.5">Find the product. Products with 0 stock show in <span class="text-red-600 font-semibold">red</span>, low stock (1–3) in <span class="text-orange-600 font-semibold">orange</span>.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">3</span>
+                <span class="text-sm text-gray-700 pt-0.5">Type the new number in the box (e.g. if you made 5 more, type <strong>5</strong>) and click <strong>Save</strong>.</span>
+            </li>
+        </ol>
+        <div class="bg-orange-50 border border-orange-100 rounded-xl px-4 py-3 text-sm text-orange-800">
+            ⚠️ <strong>Important:</strong> If a product shows "Out of stock", customers cannot add it to their cart. Restock it as soon as you have more ready.
+        </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <!-- 9. EXPORT -->
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <section id="export" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+        <h2 class="text-lg font-bold text-gray-900">9. How to download your orders as a spreadsheet</h2>
+        <p class="text-sm text-gray-600">You can download all your orders as a file that opens in Excel or Google Sheets.</p>
+        <ol class="space-y-3">
+            <li class="flex gap-3">
+                <span class="step-number">1</span>
+                <span class="text-sm text-gray-700 pt-0.5">From the dashboard, click <strong>"📥 Download Orders (CSV)"</strong>.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">2</span>
+                <span class="text-sm text-gray-700 pt-0.5">A file will download to your phone or computer. Open it in Excel, Google Sheets, or any spreadsheet app.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="step-number">3</span>
+                <span class="text-sm text-gray-700 pt-0.5">The file contains: order number, date, customer name, phone, address, items ordered, total, payment method, status, and your notes.</span>
+            </li>
+        </ol>
+        <div class="bg-green-50 border border-green-100 rounded-xl px-4 py-3 text-sm text-green-800">
+            💡 You can also download only <strong>pending orders</strong> by going to:
+            <code class="bg-green-100 px-1.5 py-0.5 rounded text-xs">/dashboard/export/orders.csv?status=PENDING</code>
+        </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <!-- 10. TIPS -->
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <section id="tips" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+        <h2 class="text-lg font-bold text-gray-900">10. Useful tips</h2>
+        <ul class="space-y-3 text-sm text-gray-700">
+            <li class="flex gap-3">
+                <span class="text-lg">📱</span>
+                <span>Every customer phone number on the dashboard is a <strong>tap-to-WhatsApp link</strong>. Tap it to open a WhatsApp chat with that customer instantly.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="text-lg">🔔</span>
+                <span>You get an <strong>email notification</strong> every time a new order is placed or a custom request is submitted. Check your email regularly.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="text-lg">📝</span>
+                <span>Use the <strong>Private Notes</strong> box on each order to keep track of what you've done — e.g. "Spoke to customer, delivering Saturday". Only you can see these notes.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="text-lg">👁️</span>
+                <span>If you want to <strong>temporarily stop selling a product</strong> (e.g. you're on holiday), untick "Show on website" in the product editor. Tick it again when you're back.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="text-lg">🔐</span>
+                <span>The dashboard is <strong>only visible to you</strong> when you're logged in. Customers cannot see it.</span>
+            </li>
+            <li class="flex gap-3">
+                <span class="text-lg">❓</span>
+                <span>If something looks wrong or broken on the website, contact your developer. Don't try to fix it yourself — you might accidentally break something.</span>
+            </li>
+        </ul>
+    </section>
+
+    <!-- ── Back to dashboard ─────────────────────────────────────────────── -->
+    <div class="text-center pb-4">
+        <a href="{% url 'dashboard' %}"
+           class="inline-flex items-center gap-2 bg-gray-900 hover:bg-pink-600 text-white text-sm font-semibold px-6 py-3 rounded-xl transition-colors">
+            ← Back to Dashboard
+        </a>
+    </div>
+
+</main>
+
+<footer class="max-w-3xl mx-auto px-4 sm:px-6 py-6 text-center text-xs text-gray-400">
+    Happy Heavens Store Guide &nbsp;·&nbsp; Only visible to you
+</footer>
+
+</body>
+</html>

@@ -9,7 +9,13 @@ from .search import search
 from .errors import custom_404, custom_403, custom_500
 from .newsletter import newsletter_subscribe
 from .seo import robots_txt, sitemap_xml
-from .dashboard import dashboard, dashboard_update_status, dashboard_stock, dashboard_update_stock
+from .dashboard import (
+    dashboard, dashboard_update_status,
+    dashboard_stock, dashboard_update_stock,
+    export_orders_csv,
+    dashboard_products, dashboard_update_product,
+    dashboard_guide,
+)
 
 __all__ = [
     'product_list', 'product_detail', 'product_detail_by_pk', 'category_detail',
@@ -24,4 +30,7 @@ __all__ = [
     'robots_txt', 'sitemap_xml',
     'dashboard', 'dashboard_update_status',
     'dashboard_stock', 'dashboard_update_stock',
+    'export_orders_csv',
+    'dashboard_products', 'dashboard_update_product',
+    'dashboard_guide',
 ]
