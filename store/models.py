@@ -104,11 +104,11 @@ class Order(models.Model):
         ('QR',  'QR Code Transfer'),
     )
     STATUS_CHOICES = (
-        ('PENDING',   '⏳ Pending — waiting for your confirmation'),
-        ('CONFIRMED', '✅ Confirmed — you have accepted this order'),
-        ('SHIPPED',   '🚚 Out for Delivery'),
-        ('DELIVERED', '🎉 Delivered — order complete'),
-        ('REJECTED',  '❌ Rejected — payment failed or order cancelled'),
+        ('PENDING',   'Pending'),
+        ('CONFIRMED', 'Confirmed'),
+        ('SHIPPED',   'Out for Delivery'),
+        ('DELIVERED', 'Delivered'),
+        ('REJECTED',  'Rejected'),
     )
 
     user = models.ForeignKey(
