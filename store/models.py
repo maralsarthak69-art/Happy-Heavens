@@ -166,6 +166,15 @@ class Order(models.Model):
             "The customer will automatically get an email & WhatsApp notification."
         ),
     )
+    notes = models.TextField(
+        blank=True,
+        default='',
+        verbose_name="Your Private Notes",
+        help_text=(
+            "Write anything here for yourself — e.g. 'Called customer, delivering Friday' "
+            "or 'Waiting for payment confirmation'. Customers never see this."
+        ),
+    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ordered On")
     updated_at = models.DateTimeField(auto_now=True,     verbose_name="Last Updated")
 

@@ -234,6 +234,13 @@ class OrderAdmin(admin.ModelAdmin):
             'fields': ('payment_method', 'total_amount', 'payment_proof_large'),
             'description': 'If the customer paid via QR, their payment screenshot appears below.',
         }),
+        ('📝 Your Private Notes', {
+            'fields': ('notes',),
+            'description': (
+                'Write anything here for yourself — e.g. "Called customer, delivering Friday". '
+                '<b>Customers never see this.</b>'
+            ),
+        }),
     )
 
     # ── Column helpers ──────────────────────────────────────────────────────

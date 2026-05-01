@@ -1,8 +1,3 @@
-"""
-Store app URL patterns.
-Grouped by domain so adding a new feature means adding a block here,
-not hunting through a monolithic core/urls.py.
-"""
 from django.urls import path
 from store.views import (
     # Products
@@ -21,6 +16,8 @@ from store.views import (
     newsletter_subscribe,
     # SEO
     robots_txt, sitemap_xml,
+    # Dashboard
+    dashboard, dashboard_update_status,
 )
 
 urlpatterns = [
@@ -57,4 +54,8 @@ urlpatterns = [
     # --- SEO ---
     path('robots.txt', robots_txt, name='robots_txt'),
     path('sitemap.xml', sitemap_xml, name='sitemap_xml'),
+
+    # --- Owner Dashboard ---
+    path('dashboard/', dashboard, name='dashboard'),
+    path('dashboard/order/<int:order_id>/update/', dashboard_update_status, name='dashboard_update_status'),
 ]

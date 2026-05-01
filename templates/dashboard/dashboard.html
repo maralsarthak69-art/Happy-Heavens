@@ -1,0 +1,304 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Dashboard — Happy Heavens</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .status-badge { display:inline-flex; align-items:center; padding:2px 10px; border-radius:9999px; font-size:11px; font-weight:600; white-space:nowrap; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<!-- ── Top bar ──────────────────────────────────────────────────────────── -->
+<header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <span class="text-lg font-semibold text-gray-900">🌸 Happy Heavens</span>
+            <span class="text-gray-300">|</span>
+            <span class="text-sm text-gray-500">Store Dashboard</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <a href="/" target="_blank"
+               class="text-xs text-gray-500 hover:text-gray-900 transition-colors">
+                View Website ↗
+            </a>
+            <a href="/admin/"
+               class="text-xs text-gray-500 hover:text-gray-900 transition-colors">
+                Full Admin ↗
+            </a>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit"
+                        class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-full transition-colors">
+                    Log out
+                </button>
+            </form>
+        </div>
+    </div>
+</header>
+
+<!-- ── Flash messages ───────────────────────────────────────────────────── -->
+{% if messages %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 space-y-2">
+    {% for message in messages %}
+    <div class="{% if message.tags == 'error' %}bg-red-50 border-red-200 text-red-800{% else %}bg-green-50 border-green-200 text-green-800{% endif %} border rounded-lg px-4 py-3 text-sm font-medium flex items-center justify-between">
+        <span>{{ message }}</span>
+        <button onclick="this.parentElement.remove()" class="ml-4 opacity-60 hover:opacity-100">✕</button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- ── Page title ───────────────────────────────────────────────────── -->
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900">Good day! 👋</h1>
+        <p class="text-sm text-gray-500 mt-1">Here's what's happening in your store today — {{ today|date:"l, d F Y" }}</p>
+    </div>
+
+    <!-- ── Stat cards ───────────────────────────────────────────────────── -->
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Today's Orders</p>
+            <p class="text-3xl font-bold text-gray-900 mt-2">{{ orders_today }}</p>
+            <p class="text-xs text-gray-400 mt-1">new orders placed today</p>
+        </div>
+
+        <div class="bg-amber-50 rounded-2xl border border-amber-100 shadow-sm p-5">
+            <p class="text-xs font-semibold text-amber-600 uppercase tracking-wider">⏳ Pending</p>
+            <p class="text-3xl font-bold text-amber-700 mt-2">{{ pending_orders }}</p>
+            <p class="text-xs text-amber-500 mt-1">need your attention</p>
+        </div>
+
+        <div class="bg-blue-50 rounded-2xl border border-blue-100 shadow-sm p-5">
+            <p class="text-xs font-semibold text-blue-600 uppercase tracking-wider">✅ Confirmed</p>
+            <p class="text-3xl font-bold text-blue-700 mt-2">{{ confirmed_orders }}</p>
+            <p class="text-xs text-blue-500 mt-1">accepted, not yet shipped</p>
+        </div>
+
+        <div class="bg-green-50 rounded-2xl border border-green-100 shadow-sm p-5">
+            <p class="text-xs font-semibold text-green-600 uppercase tracking-wider">💰 Revenue</p>
+            <p class="text-3xl font-bold text-green-700 mt-2">₹{{ total_revenue|floatformat:0 }}</p>
+            <p class="text-xs text-green-500 mt-1">from delivered orders</p>
+        </div>
+
+        <div class="{% if new_requests > 0 %}bg-pink-50 border-pink-100{% else %}bg-white border-gray-100{% endif %} rounded-2xl border shadow-sm p-5">
+            <p class="text-xs font-semibold {% if new_requests > 0 %}text-pink-600{% else %}text-gray-400{% endif %} uppercase tracking-wider">💡 Custom Requests</p>
+            <p class="text-3xl font-bold {% if new_requests > 0 %}text-pink-700{% else %}text-gray-900{% endif %} mt-2">{{ new_requests }}</p>
+            <p class="text-xs {% if new_requests > 0 %}text-pink-500{% else %}text-gray-400{% endif %} mt-1">submitted today</p>
+        </div>
+
+    </div>
+
+    <!-- ── Low stock warning ─────────────────────────────────────────────── -->
+    {% if low_stock %}
+    <div class="bg-orange-50 border border-orange-200 rounded-2xl p-5">
+        <h2 class="text-sm font-bold text-orange-800 mb-3">⚠️ Low Stock — Restock Soon</h2>
+        <div class="flex flex-wrap gap-2">
+            {% for product in low_stock %}
+            <a href="/admin/store/product/{{ product.id }}/change/"
+               class="inline-flex items-center gap-2 bg-white border border-orange-200 rounded-full px-3 py-1.5 text-xs font-medium text-orange-800 hover:bg-orange-100 transition-colors">
+                {{ product.name }}
+                <span class="{% if product.stock == 0 %}bg-red-100 text-red-700{% else %}bg-orange-100 text-orange-700{% endif %} px-2 py-0.5 rounded-full font-bold">
+                    {% if product.stock == 0 %}Out of stock{% else %}{{ product.stock }} left{% endif %}
+                </span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ── Main content: orders + custom requests ────────────────────────── -->
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+        <!-- Orders table (takes 2/3 width on xl) -->
+        <div class="xl:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <h2 class="font-bold text-gray-900">🛍️ Recent Orders</h2>
+                <a href="/admin/store/order/" class="text-xs text-gray-400 hover:text-gray-700 transition-colors">
+                    See all in admin ↗
+                </a>
+            </div>
+
+            {% if orders_with_meta %}
+            <div class="divide-y divide-gray-50">
+                {% for row in orders_with_meta %}
+                <div class="px-6 py-4" id="order-row-{{ row.order.id }}">
+
+                    <!-- Order header row -->
+                    <div class="flex items-start justify-between gap-4 mb-3">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="font-bold text-gray-900 text-sm">#{{ row.order.id }}</span>
+                                <span class="status-badge {{ row.meta.bg }} {{ row.meta.text }}">
+                                    {{ row.meta.label }}
+                                </span>
+                                {% if row.order.payment_method == 'QR' %}
+                                <span class="status-badge bg-purple-100 text-purple-700">📲 QR</span>
+                                {% else %}
+                                <span class="status-badge bg-yellow-100 text-yellow-700">💵 COD</span>
+                                {% endif %}
+                            </div>
+                            <p class="text-sm font-semibold text-gray-800 mt-1">{{ row.order.full_name }}</p>
+                            <p class="text-xs text-gray-400">
+                                <a href="https://wa.me/91{{ row.order.phone_number|slice:'0:' }}"
+                                   target="_blank"
+                                   class="text-green-600 hover:underline font-medium">
+                                    📱 {{ row.order.phone_number }}
+                                </a>
+                                &nbsp;·&nbsp; {{ row.order.city }}
+                                &nbsp;·&nbsp; {{ row.order.created_at|date:"d M, g:i A" }}
+                            </p>
+                            <p class="text-xs text-gray-500 mt-1 truncate max-w-xs">{{ row.items_summary }}</p>
+                        </div>
+                        <div class="text-right flex-shrink-0">
+                            <p class="font-bold text-gray-900">₹{{ row.order.total_amount|floatformat:0 }}</p>
+                            {% if row.order.payment_screenshot %}
+                            <a href="{{ row.order.payment_screenshot.url }}" target="_blank"
+                               class="text-xs text-purple-600 hover:underline">View proof ↗</a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Inline update form -->
+                    <form method="post" action="{% url 'dashboard_update_status' row.order.id %}"
+                          class="bg-gray-50 rounded-xl p-3 space-y-2">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{% url 'dashboard' %}">
+
+                        <div class="flex flex-wrap gap-2 items-end">
+                            <!-- Status dropdown -->
+                            <div class="flex-1 min-w-[160px]">
+                                <label class="block text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                                    Update Status
+                                </label>
+                                <select name="status"
+                                        class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-pink-300">
+                                    {% for value, display in status_choices %}
+                                    <option value="{{ value }}" {% if row.order.status == value %}selected{% endif %}>
+                                        {{ display }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Save button -->
+                            <button type="submit"
+                                    class="bg-gray-900 hover:bg-pink-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors whitespace-nowrap">
+                                Save
+                            </button>
+                        </div>
+
+                        <!-- Notes field -->
+                        <div>
+                            <label class="block text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                                Your Private Notes (customers never see this)
+                            </label>
+                            <textarea name="notes" rows="2" placeholder="e.g. Called customer, delivering Friday…"
+                                      class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-pink-300 resize-none">{{ row.order.notes }}</textarea>
+                        </div>
+
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="px-6 py-16 text-center">
+                <p class="text-4xl mb-3">🎉</p>
+                <p class="text-gray-500 text-sm">No orders yet — share your store link!</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Custom requests sidebar (1/3 width on xl) -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <h2 class="font-bold text-gray-900">💡 Custom Requests</h2>
+                <a href="/admin/store/customrequest/" class="text-xs text-gray-400 hover:text-gray-700 transition-colors">
+                    See all ↗
+                </a>
+            </div>
+
+            {% if custom_requests %}
+            <div class="divide-y divide-gray-50">
+                {% for req in custom_requests %}
+                <div class="px-5 py-4">
+                    <div class="flex items-start justify-between gap-2 mb-1">
+                        <p class="font-semibold text-sm text-gray-900">{{ req.name }}</p>
+                        <span class="text-[10px] text-gray-400 whitespace-nowrap flex-shrink-0">
+                            {{ req.submitted_at|date:"d M" }}
+                        </span>
+                    </div>
+                    <a href="https://wa.me/91{{ req.phone_number }}"
+                       target="_blank"
+                       class="text-xs text-green-600 hover:underline font-medium">
+                        📱 {{ req.phone_number }}
+                    </a>
+                    <p class="text-xs text-gray-500 mt-1 line-clamp-2">{{ req.idea_description }}</p>
+                    {% if req.reference_image %}
+                    <a href="{{ req.reference_image.url }}" target="_blank"
+                       class="inline-block mt-2">
+                        <img src="{{ req.reference_image.url }}" alt="Reference"
+                             class="w-16 h-16 object-cover rounded-lg border border-gray-100">
+                    </a>
+                    {% endif %}
+                    <a href="/admin/store/customrequest/{{ req.id }}/change/"
+                       class="inline-block mt-2 text-[10px] text-gray-400 hover:text-gray-700 transition-colors">
+                        Open in admin ↗
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="px-6 py-12 text-center">
+                <p class="text-3xl mb-2">✨</p>
+                <p class="text-gray-400 text-sm">No custom requests yet.</p>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- ── Quick links ───────────────────────────────────────────────────── -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <h2 class="font-bold text-gray-900 mb-4">⚡ Quick Actions</h2>
+        <div class="flex flex-wrap gap-3">
+            <a href="/admin/store/product/add/"
+               class="inline-flex items-center gap-2 bg-gray-900 hover:bg-pink-600 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
+                ➕ Add New Product
+            </a>
+            <a href="/admin/store/order/?status__exact=PENDING"
+               class="inline-flex items-center gap-2 bg-amber-100 hover:bg-amber-200 text-amber-800 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
+                ⏳ View Pending Orders
+            </a>
+            <a href="/admin/store/customrequest/"
+               class="inline-flex items-center gap-2 bg-pink-100 hover:bg-pink-200 text-pink-800 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
+                💡 All Custom Requests
+            </a>
+            <a href="/admin/store/product/?stock__lte=3"
+               class="inline-flex items-center gap-2 bg-orange-100 hover:bg-orange-200 text-orange-800 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
+                ⚠️ Low Stock Products
+            </a>
+            <a href="/admin/store/newslettersubscriber/"
+               class="inline-flex items-center gap-2 bg-blue-100 hover:bg-blue-200 text-blue-800 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
+                📧 Newsletter Subscribers
+            </a>
+        </div>
+    </div>
+
+</main>
+
+<footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-xs text-gray-400">
+    Happy Heavens Store Dashboard &nbsp;·&nbsp; Only visible to you
+</footer>
+
+</body>
+</html>
