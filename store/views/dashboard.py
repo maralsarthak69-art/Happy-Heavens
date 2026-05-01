@@ -3,12 +3,11 @@ Owner Dashboard — /dashboard/
 Staff-only page giving a full at-a-glance view of the store.
 Handles:
   • Summary stats (today's orders, pending, revenue, low stock, new custom requests)
-  • Recent orders list with inline status update
+  • Recent orders list with inline status update + notes
   • New custom requests list
   • Low-stock product list
+  • Stock manager — update any product's stock without going into admin
 """
-from datetime import date
-
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
@@ -29,7 +28,6 @@ STATUS_META = {
     'REJECTED':  {'label': '❌ Rejected',          'bg': 'bg-red-100',    'text': 'text-red-800'},
 }
 
-# All statuses available in the dropdown on the dashboard
 STATUS_CHOICES = [
     ('PENDING',   '⏳ Pending'),
     ('CONFIRMED', '✅ Confirmed'),
@@ -39,30 +37,31 @@ STATUS_CHOICES = [
 ]
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Main dashboard
+# ─────────────────────────────────────────────────────────────────────────────
 @staff_member_required(login_url='/login/')
 def dashboard(request):
-    """Main dashboard view — read-only summary + recent data."""
+    """Main dashboard — stats, recent orders, custom requests, low-stock bar."""
     today = now().date()
 
-    # ── Stats ────────────────────────────────────────────────────────────────
-    orders_today   = Order.objects.filter(created_at__date=today).count()
-    pending_orders = Order.objects.filter(status='PENDING').count()
+    # Stats
+    orders_today     = Order.objects.filter(created_at__date=today).count()
+    pending_orders   = Order.objects.filter(status='PENDING').count()
     confirmed_orders = Order.objects.filter(status='CONFIRMED').count()
-    total_revenue  = sum(
-        o.total_amount
-        for o in Order.objects.filter(status='DELIVERED')
+    total_revenue    = sum(
+        o.total_amount for o in Order.objects.filter(status='DELIVERED')
     )
-    new_requests   = CustomRequest.objects.filter(submitted_at__date=today).count()
-    low_stock      = Product.objects.filter(is_active=True, stock__lte=3).order_by('stock')
+    new_requests = CustomRequest.objects.filter(submitted_at__date=today).count()
+    low_stock    = Product.objects.filter(is_active=True, stock__lte=3).order_by('stock')
 
-    # ── Recent orders (last 20) ───────────────────────────────────────────────
+    # Recent orders (last 20)
     recent_orders = (
         Order.objects
         .select_related('user')
         .prefetch_related('items__product')
         .order_by('-created_at')[:20]
     )
-    # Attach status meta to each order for template rendering
     orders_with_meta = [
         {
             'order': o,
@@ -75,18 +74,16 @@ def dashboard(request):
         for o in recent_orders
     ]
 
-    # ── New custom requests (last 10) ─────────────────────────────────────────
+    # Custom requests (last 10)
     custom_requests = CustomRequest.objects.order_by('-submitted_at')[:10]
 
     return render(request, 'dashboard/dashboard.html', {
-        # Stats
-        'orders_today':    orders_today,
-        'pending_orders':  pending_orders,
-        'confirmed_orders': confirmed_orders,
-        'total_revenue':   total_revenue,
-        'new_requests':    new_requests,
-        'low_stock':       low_stock,
-        # Lists
+        'orders_today':      orders_today,
+        'pending_orders':    pending_orders,
+        'confirmed_orders':  confirmed_orders,
+        'total_revenue':     total_revenue,
+        'new_requests':      new_requests,
+        'low_stock':         low_stock,
         'orders_with_meta':  orders_with_meta,
         'custom_requests':   custom_requests,
         'status_choices':    STATUS_CHOICES,
@@ -94,10 +91,13 @@ def dashboard(request):
     })
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Order status + notes update (POST from dashboard)
+# ─────────────────────────────────────────────────────────────────────────────
 @staff_member_required(login_url='/login/')
 @require_POST
 def dashboard_update_status(request, order_id):
-    """AJAX-style POST — update a single order's status from the dashboard."""
+    """Update a single order's status and notes from the dashboard."""
     order      = get_object_or_404(Order, pk=order_id)
     new_status = request.POST.get('status', '').strip()
     new_notes  = request.POST.get('notes', '').strip()
@@ -115,5 +115,75 @@ def dashboard_update_status(request, order_id):
     else:
         messages.error(request, "Invalid status — order was not updated.")
 
-    # Return to the dashboard, preserving any filter in the URL
     return redirect(request.POST.get('next', 'dashboard'))
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Stock manager page  —  /dashboard/stock/
+# ─────────────────────────────────────────────────────────────────────────────
+@staff_member_required(login_url='/login/')
+def dashboard_stock(request):
+    """
+    Full stock management page.
+    Shows every active product grouped by category with current stock,
+    colour-coded warnings, and an inline input to update each one.
+    """
+    # Group products by category for a cleaner layout
+    from itertools import groupby
+    from operator import attrgetter
+
+    products = (
+        Product.objects
+        .filter(is_active=True)
+        .select_related('category')
+        .order_by('category__name', 'name')
+    )
+
+    # Build grouped list: [(category_name, [product, ...]), ...]
+    grouped = []
+    for cat_name, prods in groupby(products, key=lambda p: p.category.name):
+        grouped.append((cat_name, list(prods)))
+
+    # Summary counts for the top bar
+    out_of_stock = Product.objects.filter(is_active=True, stock=0).count()
+    low_stock    = Product.objects.filter(is_active=True, stock__gt=0, stock__lte=3).count()
+    total_active = Product.objects.filter(is_active=True).count()
+
+    return render(request, 'dashboard/stock.html', {
+        'grouped':      grouped,
+        'out_of_stock': out_of_stock,
+        'low_stock':    low_stock,
+        'total_active': total_active,
+    })
+
+
+@staff_member_required(login_url='/login/')
+@require_POST
+def dashboard_update_stock(request, product_id):
+    """Update a single product's stock from the stock manager page."""
+    product   = get_object_or_404(Product, pk=product_id)
+    raw_stock = request.POST.get('stock', '').strip()
+
+    try:
+        new_stock = int(raw_stock)
+        if new_stock < 0:
+            raise ValueError
+    except (ValueError, TypeError):
+        messages.error(request, f'"{raw_stock}" is not a valid stock number.')
+        return redirect('dashboard_stock')
+
+    old_stock     = product.stock
+    product.stock = new_stock
+    product.save(update_fields=['stock'])
+
+    if new_stock == 0:
+        messages.warning(request, f'"{product.name}" is now out of stock.')
+    elif new_stock <= 3:
+        messages.warning(request, f'"{product.name}" updated to {new_stock} — still low stock.')
+    else:
+        messages.success(
+            request,
+            f'"{product.name}" stock updated: {old_stock} → {new_stock}.'
+        )
+
+    return redirect(request.POST.get('next', 'dashboard_stock'))

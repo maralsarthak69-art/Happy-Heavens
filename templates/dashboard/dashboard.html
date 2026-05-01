@@ -101,10 +101,16 @@
     <!-- ── Low stock warning ─────────────────────────────────────────────── -->
     {% if low_stock %}
     <div class="bg-orange-50 border border-orange-200 rounded-2xl p-5">
-        <h2 class="text-sm font-bold text-orange-800 mb-3">⚠️ Low Stock — Restock Soon</h2>
+        <div class="flex items-center justify-between mb-3">
+            <h2 class="text-sm font-bold text-orange-800">⚠️ Low Stock — Restock Soon</h2>
+            <a href="{% url 'dashboard_stock' %}"
+               class="text-xs text-orange-600 hover:text-orange-900 font-semibold underline underline-offset-2">
+                Manage all stock →
+            </a>
+        </div>
         <div class="flex flex-wrap gap-2">
             {% for product in low_stock %}
-            <a href="/admin/store/product/{{ product.id }}/change/"
+            <a href="{% url 'dashboard_stock' %}"
                class="inline-flex items-center gap-2 bg-white border border-orange-200 rounded-full px-3 py-1.5 text-xs font-medium text-orange-800 hover:bg-orange-100 transition-colors">
                 {{ product.name }}
                 <span class="{% if product.stock == 0 %}bg-red-100 text-red-700{% else %}bg-orange-100 text-orange-700{% endif %} px-2 py-0.5 rounded-full font-bold">
@@ -274,6 +280,10 @@
             <a href="/admin/store/product/add/"
                class="inline-flex items-center gap-2 bg-gray-900 hover:bg-pink-600 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
                 ➕ Add New Product
+            </a>
+            <a href="{% url 'dashboard_stock' %}"
+               class="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
+                📦 Manage Stock
             </a>
             <a href="/admin/store/order/?status__exact=PENDING"
                class="inline-flex items-center gap-2 bg-amber-100 hover:bg-amber-200 text-amber-800 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">

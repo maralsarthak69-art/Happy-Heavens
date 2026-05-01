@@ -18,6 +18,7 @@ from store.views import (
     robots_txt, sitemap_xml,
     # Dashboard
     dashboard, dashboard_update_status,
+    dashboard_stock, dashboard_update_stock,
 )
 
 urlpatterns = [
@@ -58,4 +59,6 @@ urlpatterns = [
     # --- Owner Dashboard ---
     path('dashboard/', dashboard, name='dashboard'),
     path('dashboard/order/<int:order_id>/update/', dashboard_update_status, name='dashboard_update_status'),
+    path('dashboard/stock/', dashboard_stock, name='dashboard_stock'),
+    path('dashboard/stock/<int:product_id>/update/', dashboard_update_stock, name='dashboard_update_stock'),
 ]
